@@ -5,6 +5,7 @@ import { Tag } from "emblor";
 import { SearchBar } from './components/search';
 import ShimmerButton from './components/ui/shimmer-button';
 import { DockBottom } from './components/dock';
+import { Button } from './components/ui/button';
 
 
 
@@ -15,10 +16,20 @@ const App = () => {
   const [exampleTagsWords, setExampleTagsWords] = useState<Tag[]>(tagsExampleWords);
   const [exampleTagsWordsInTitle, setExampleTagsWordsInTitle] = useState<Tag[]>(tagsExampleWordsInTitle);
   const [exampleTagsWordsInUrl, setExampleTagsWordsInUrl] = useState<Tag[]>(tagsExampleWordsInUrl);
-  const [exampleTagsWordsInText, setExampleTagsWordsInText] = useState<Tag[]>(tagsExampleWordsInText);
+  // const [exampleTagsWordsInText, setExampleTagsWordsInText] = useState<Tag[]>(tagsExampleWordsInText);
   const [exampleTagsSites, setExampleTagsSites] = useState<Tag[]>(tagsExampleSites);
-
   const [searchText, setSearchText] = useState("");
+
+
+  function deleteAllTags() {
+    setExampleTagsSites([])
+    setExampleTagsWordsInUrl([])
+    setExampleTagsWordsInTitle([])
+    setExampleTagsWords([])
+    setExampleTagsFileType([])
+    setExampleTagsSitesToExclude([])
+  }
+
   return (
     <>
       <header className="flex items-center justify-center">
@@ -26,7 +37,7 @@ const App = () => {
       </header>
 
 
-      <div className="options flex flex-col gap-3 mt-3">
+      <div className="options flex flex-col gap-1 mt-3">
         <InputTags id='websites' label='websites' placeholder='sur quels websites ou noms de domaines tu veux faire les recherches' exampleTags={exampleTagsSites} setExampleTags={setExampleTagsSites} />
         <InputTags id='site-toExclude' label='ajouter des sites a exclure' placeholder='ajouter des sites a exclure  ' exampleTags={exampleTagsSitesToExclude} setExampleTags={setExampleTagsSitesToExclude} />
         <InputTags id='word-toExclude' label='ajouter des mots a exclure' placeholder='ajouter des mots a exclure' exampleTags={exampleTagsWords} setExampleTags={setExampleTagsWords} />
@@ -34,6 +45,7 @@ const App = () => {
         <InputTags id="intitle" label="intitle" placeholder="mots qui doivent apparaître dans le titre" exampleTags={exampleTagsWordsInTitle} setExampleTags={setExampleTagsWordsInTitle} />
         <InputTags id="inurl" label="inurl" placeholder="mots qui doivent apparaître dans l'url" exampleTags={exampleTagsWordsInUrl} setExampleTags={setExampleTagsWordsInUrl} />
         {/* <InputTags id="intext" label="intext" placeholder="mots qui doivent apparaître dans le texte" exampleTags={exampleTagsWordsInText} setExampleTags={setExampleTagsWordsInText} /> */}
+        <Button variant={'outline'} className='w-64 ml-auto' onClick={deleteAllTags}>effacer tout </Button>
       </div>
       <div className='flex justify-between items-center'>
         <ShimmerButton className='flex  w-92'>I'm feeling lucky</ShimmerButton>
