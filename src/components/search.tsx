@@ -1,5 +1,6 @@
 import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-vanish-input";
 import TypingAnimation from "@/components/ui/typing-animation";
+import { RainbowButton } from "./ui/rainbow-button";
 
 export function SearchBar({ setSearchText }: { setSearchText: React.Dispatch<React.SetStateAction<string>> }) {
   const placeholders = [
@@ -16,14 +17,18 @@ export function SearchBar({ setSearchText }: { setSearchText: React.Dispatch<Rea
     e.preventDefault();
   };
   return (
-    <div className=" flex flex-col justify-center  items-center px-3 py-1 w-2/3">
+    <div className=" flex flex-col justify-center  items-center px-3 py-1 w-full">
       <TypingAnimation className='mb-7'>Find anything like a magician</TypingAnimation>
 
-      <PlaceholdersAndVanishInput
-        placeholders={placeholders}
-        onChange={handleChange}
-        onSubmit={onSubmit}
-      />
+      <div className="flex w-5/6">
+        <PlaceholdersAndVanishInput
+          placeholders={placeholders}
+          onChange={handleChange}
+          onSubmit={onSubmit}
+        />
+        <RainbowButton className="w-64 "> search with AI</RainbowButton>
+      </div>
     </div>
+
   );
 }
