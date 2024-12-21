@@ -4,7 +4,7 @@ import { RainbowButton } from "./ui/rainbow-button";
 
 export function SearchBar({ setSearchText }: { setSearchText: React.Dispatch<React.SetStateAction<string>> }) {
   const placeholders = [
-    "What do you want to know?",
+    "let's find something",
     "Feel free to ask anything",
     "Hope you like Deep Search",
   ];
