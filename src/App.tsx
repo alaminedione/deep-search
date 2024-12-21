@@ -1,12 +1,8 @@
 import './App.css'
 import { useState } from "react";
-import TypingAnimation from "./components/ui/typing-animation"
-import { Input } from "./components/ui/input"
-import { Search } from 'lucide-react'
-import { Button } from "./components/ui/button"
-import InputEndAddOn from "./components/input-end-add-on"
 import InputTags from './components/input-tags'
 import { Tag } from "emblor";
+import { SearchBar } from './components/search';
 
 
 
@@ -18,7 +14,7 @@ const App = () => {
     },
     {
       id: "2",
-      text: "lucky.com",
+      text: ".com",
     },
     {
       id: "3",
@@ -97,34 +93,45 @@ const App = () => {
     }
   ];
 
+  const tagsExampleSitesToExclude = [
+    {
+      id: "1",
+      text: "example.com",
+    },
+    {
+      id: "2",
+      text: "mydomain.com",
+    },
+    {
+      id: "3",
+      text: "manni.net",
+    }
+  ];
+
   const [exampleTagsFileType, setExampleTagsFileType] = useState<Tag[]>(tagsExampleFileType);
-  const [exampleTagsSites, setExampleTagsSites] = useState<Tag[]>(tagsExampleSites);
+  const [exampleTagsSitesToExclude, setExampleTagsSitesToExclude] = useState<Tag[]>(tagsExampleSitesToExclude);
   const [exampleTagsWords, setExampleTagsWords] = useState<Tag[]>(tagsExampleWords);
   const [exampleTagsWordsInTitle, setExampleTagsWordsInTitle] = useState<Tag[]>(tagsExampleWordsInTitle);
   const [exampleTagsWordsInUrl, setExampleTagsWordsInUrl] = useState<Tag[]>(tagsExampleWordsInUrl);
   const [exampleTagsWordsInText, setExampleTagsWordsInText] = useState<Tag[]>(tagsExampleWordsInText);
+  const [exampleTagsSites, setExampleTagsSites] = useState<Tag[]>(tagsExampleSites);
+
+  const [searchText, setSearchText] = useState("");
   return (
     <>
       <header className="flex items-center justify-center">
-        <TypingAnimation>
-          Deep Search
-        </TypingAnimation>
+        <SearchBar setSearchText={setSearchText} />
       </header>
 
-      <div className="search-bar flex items-center justify-center ">
-        <Input type="text" placeholder="Search..." className=" w-1/2" />
-        <Button> <Search className="search-icon" /> Search</Button>
-      </div>
 
       <div className="options flex flex-col gap-3 m-10">
-        <InputEndAddOn addon='https://' placeholder='example.com  ou .com   pour les sites avec comme nom de domaine .com' />
-        <InputTags id='site-toExclude' label='ajouter des sites a exclure' placeholder='ajouter des sites a exclure  ' exampleTags={exampleTagsSites} setExampleTags={setExampleTagsSites} />
+        <InputTags id='websites' label='websites' placeholder='sur quels websites ou noms de domaines tu veux faire les recherches' exampleTags={exampleTagsSites} setExampleTags={setExampleTagsSites} />
+        <InputTags id='site-toExclude' label='ajouter des sites a exclure' placeholder='ajouter des sites a exclure  ' exampleTags={exampleTagsSitesToExclude} setExampleTags={setExampleTagsSitesToExclude} />
         <InputTags id='word-toExclude' label='ajouter des mots a exclure' placeholder='ajouter des mots a exclure' exampleTags={exampleTagsWords} setExampleTags={setExampleTagsWords} />
         <InputTags id='filetypes' label='ajouter les types de fichiers' placeholder="types de fichier example: pdf, docx, mp4, png" exampleTags={exampleTagsFileType} setExampleTags={setExampleTagsFileType} />
         <InputTags id="intitle" label="intitle" placeholder="mots qui doivent apparaître dans le titre" exampleTags={exampleTagsWordsInTitle} setExampleTags={setExampleTagsWordsInTitle} />
         <InputTags id="inurl" label="inurl" placeholder="mots qui doivent apparaître dans l'url" exampleTags={exampleTagsWordsInUrl} setExampleTags={setExampleTagsWordsInUrl} />
         <InputTags id="intext" label="intext" placeholder="mots qui doivent apparaître dans le texte" exampleTags={exampleTagsWordsInText} setExampleTags={setExampleTagsWordsInText} />
-
       </div>
     </>
 
