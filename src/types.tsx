@@ -8,6 +8,6 @@ export type TInputTags = {
   id?: string;
   label: string;
   placeholder: string;
-  exampleTags: Tag[];
-  setExampleTags: React.Dispatch<React.SetStateAction<Tag[]>>;
+  tags: Tag[];
+  setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
 };

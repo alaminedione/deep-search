@@ -4,7 +4,7 @@ import { useState } from "react";
 import { TInputTags } from "../types";
 
 
-export default function InputTags({ id, label, placeholder, exampleTags, setExampleTags }: TInputTags) {
+export default function InputTags({ id, label, placeholder, tags, setTags }: TInputTags) {
   const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
 
   return (
@@ -12,9 +12,9 @@ export default function InputTags({ id, label, placeholder, exampleTags, setExam
       {/* <Label htmlFor={id}>{label}</Label> */}
       <TagInput
         id={id}
-        tags={exampleTags}
+        tags={tags}
         setTags={(newTags) => {
-          setExampleTags(newTags);
+          setTags(newTags);
         }}
         placeholder={placeholder}
         styleClasses={{
