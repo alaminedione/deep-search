@@ -1,7 +1,3 @@
-"use client";
-
-import React from "react";
-
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { HistorySheet } from "./history";
 import { Settings } from "lucide-react";
