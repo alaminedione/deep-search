@@ -4,8 +4,7 @@ export type InputEndAddon = {
   placeholder: string;
 };
 
-export type TInputTags = {
-  id?: string;
+export interface TInputTags {
   label: string;
   placeholder: string;
   tags: Tag[];
