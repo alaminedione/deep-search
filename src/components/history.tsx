@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet"
 
 import { History } from "lucide-react"
+import { Checkbox } from "./ui/checkbox"
 
 
 export function HistorySheet() {
@@ -23,28 +24,39 @@ export function HistorySheet() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit profile</SheetTitle>
+          <SheetTitle>History</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you're done.
+            En developpement
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input id="name" value="Pedro Duarte" className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input id="username" value="@peduarte" className="col-span-3" />
-          </div>
+          <ul>
+            <li className="flex justify-between">
+              <Checkbox />
+              <div> requetes </div>
+              <span>
+                copy
+              </span>
+              <span>
+                delete
+              </span>
+            </li>
+            <li className="flex justify-between">
+              <Checkbox />
+              <div> requetes </div>
+              <span>
+                copy
+              </span>
+              <span>
+                delete
+              </span>
+            </li>
+
+          </ul>
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">clear all</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
