@@ -10,3 +10,5 @@ export interface TInputTags {
   tags: Tag[];
   setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
 };
+
+export type TSearchEngine = "duckduckgo.com" | "google.com"
