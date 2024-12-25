@@ -44,7 +44,7 @@ const App = () => {
 
     // Construction des paramètres de requête
     const queryParams = [sitesIncluded, excludeSites, fileTypes, wodsExcluded, wodsInTitle, wodsInUrl].filter(param => param);
-    const queryString = queryParams.join(' ');
+    const queryString = `${searchText} ${queryParams.join(' ')}`
 
     // Encodage et ouverture du nouvel onglet
     const encodedQueryString = encodeURIComponent(queryString);
