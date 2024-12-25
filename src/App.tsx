@@ -7,6 +7,7 @@ import { DockBottom } from './components/dock';
 import { Button } from './components/ui/button';
 import { useToast } from "./hooks/use-toast";
 import { TSearchEngine } from "./types";
+import { tagsSites, tagsWords, tagsFileType, tagsWordsInTitle, tagsWordsInUrl, tagsSitesToExclude } from "./lib/tags-examples";
 
 const App = () => {
   const [TagsFileType, setExampleTagsFileType] = useState<Tag[]>(tagsFileType);
@@ -100,43 +101,5 @@ const App = () => {
 }
 
 
-const tagsSites = [
-  {
-    id: "1",
-    text: "example.com",
-  },
-  {
-    id: "2",
-    text: ".com",
-  },
-  {
-    id: "3",
-    text: ".org"
-  }
-];
-const tagsWords: Tag[] = [
-];
-const tagsFileType: Tag[] = [
-  {
-    id: "1",
-    text: "pdf",
-  },
-  {
-    id: "2",
-    text: "epub",
-  },
-];
-const tagsWordsInTitle: Tag[] = [
-  {
-    id: "1",
-    text: "l'étranger",
-  },
-  {
-    id: "2",
-    text: "albert camus ",
-  },
-];
-const tagsWordsInUrl: Tag[] = [];
-const tagsSitesToExclude: Tag[] = [];
 
 export default App
