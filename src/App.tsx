@@ -1,5 +1,5 @@
 import './App.css'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InputTags from './components/input-tags'
 import { Tag } from "emblor";
 import { SearchBar } from './components/search';
@@ -9,7 +9,16 @@ import { useToast } from "./hooks/use-toast";
 import { TSearchEngine } from "./types";
 import { tagsSites, tagsWords, tagsFileType, tagsWordsInTitle, tagsWordsInUrl, tagsSitesToExclude } from "./lib/tags-examples";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 const App = () => {
+
   const [TagsFileType, setExampleTagsFileType] = useState<Tag[]>(tagsFileType);
   const [TagsSitesToExclude, setExampleTagsSitesToExclude] = useState<Tag[]>(tagsSitesToExclude);
   const [TagsWords, setExampleTagsWords] = useState<Tag[]>(tagsWords);
@@ -18,7 +27,16 @@ const App = () => {
   const [TagsSites, setExampleTagsSites] = useState<Tag[]>(tagsSites);
   const [searchText, setSearchText] = useState("");
   const { toast } = useToast()
+  const defaultSearchEngine: TSearchEngine = "duckduckgo.com"
+  const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
 
+  // Charger la valeur depuis localStorage lors du montage du composant
+  useEffect(() => {
+    const storedValue = localStorage.getItem("searchEngine");
+    if (storedValue) {
+      setSearchEngine(storedValue as TSearchEngine);
+    }
+  }, [setSearchEngine]);
 
   function deleteAllTags() {
     setExampleTagsSites([])
@@ -30,8 +48,7 @@ const App = () => {
   }
 
 
-  const defaultSearchEngine: TSearchEngine = "duckduckgo.com"
-  const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
+
 
   function search() {
     // Vérification des tableaux
@@ -71,11 +88,33 @@ const App = () => {
     window.open(searchUrl, '_blank');
   }
 
+
+  // Gestionnaire pour la mise à jour de la valeur
+  const handleSearchEngine = (value: string) => {
+    setSearchEngine(value as TSearchEngine);
+    localStorage.setItem("searchEngine", value); // Stocker dans localStorage
+  };
+
+
   return (
     <>
-      <h1 className='text-3xl text-center mb-3 mt-7' style={{ fontFamily: "JetBrains Mono" }}>Deep Search</h1>
+      <nav className="flex items-center justify-between">
+        <h1 className='text-3xl text-center mb-3 mt-7' style={{ fontFamily: "JetBrains Mono" }}>Deep Search</h1>
+
+        <Select value={searchEngine} onValueChange={handleSearchEngine} >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={searchEngine} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="duckduckgo.com">duckduckgo.com</SelectItem>
+            <SelectItem value="google.com">google.com</SelectItem>
+          </SelectContent>
+        </Select>
+      </nav>
+
       <header className="flex items-center justify-center">
         <SearchBar setSearchText={setSearchText} searchText={searchText} searchEngine={searchEngine} />
+
       </header>
       <div className="options flex flex-col gap-3">
         <InputTags id='websites' label='websites' placeholder='sur quels websites ou noms de domaines tu veux faire les recherches' tags={TagsSites} setTags={setExampleTagsSites} />
@@ -99,7 +138,5 @@ const App = () => {
 
   )
 }
-
-
 
 export default App
