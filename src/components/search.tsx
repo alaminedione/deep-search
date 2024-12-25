@@ -3,23 +3,18 @@ import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-va
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { useToast } from "../hooks/use-toast"
-type SearchBarProps = {
-  setSearchText: React.Dispatch<React.SetStateAction<string>>;
-  searchText: string;
-  searchEngine: string;
-};
+import { SearchBarProps } from "../types";
 
-export function SearchBar(
-  { setSearchText, searchText, searchEngine }: SearchBarProps) {
+export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBarProps) {
 
+  const { toast } = useToast()
+  const tokens = `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`
   const placeholders = [
     "let's find something",
     "Feel free to ask anything",
     "Hope you like Deep Search",
   ];
 
-  const { toast } = useToast()
-  const tokens = `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`
 
   async function fetchQuery(query: string) {
     return await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -58,7 +53,7 @@ export function SearchBar(
     });
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(e.target.value);
   };
 
@@ -103,7 +98,8 @@ export function SearchBar(
       })
       .finally(() => setIsSubmitting(false));
   }
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     Submit();
   };

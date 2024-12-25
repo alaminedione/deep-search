@@ -12,3 +12,10 @@ export interface TInputTags {
 };
 
 export type TSearchEngine = "duckduckgo.com" | "google.com"
+
+export type SearchBarProps = {
+  setSearchText: React.Dispatch<React.SetStateAction<string>>;
+  searchText: string;
+  searchEngine: string;
+};
+
