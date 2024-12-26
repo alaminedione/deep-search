@@ -8,7 +8,8 @@ import { SearchBarProps } from "../types";
 export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBarProps) {
 
   const { toast } = useToast()
-  const tokens = `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`
+  const tokens = import.meta.env.VITE_OPENROUTER_API_KEY
+
   const placeholders = [
     "let's find something",
     "Feel free to ask anything",

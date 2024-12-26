@@ -9,10 +9,10 @@
     }
   ],
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
       "@/*": [
-        "./src/*"
+        "*"
       ]
     }
   }

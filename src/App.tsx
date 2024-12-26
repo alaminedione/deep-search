@@ -1,9 +1,9 @@
 import './App.css'
 import { useState, useEffect } from "react";
-import InputTags from './components/input-tags'
+import InputTags from '@/components/input-tags' 
 import { Tag } from "emblor";
 import { SearchBar } from './components/search';
-import { DockBottom } from './components/dock';
+import { DockBottom } from '@/components/dock';
 import { Button } from './components/ui/button';
 import { useToast } from "./hooks/use-toast";
 import { TSearchEngine } from "./types";
@@ -15,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "./components/ui/select"
 
 const App = () => {
 

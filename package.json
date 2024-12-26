@@ -1,7 +1,8 @@
 {
   "name": "deep-search",
+  "description": "Une application web pour effectuer des recherches avancées et pertinentes en utilisant les opérateurs Google Dorks. Elle offre également la possibilité d'intégrer une intelligence artificielle (IA) de votre choix via une API, permettant de générer automatiquement des requêtes complexes avec les opérateurs Dorks.",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
