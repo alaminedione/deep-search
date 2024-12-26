@@ -7,7 +7,6 @@ export type InputEndAddon = {
 };
 
 export interface TInputTags {
-  label: string;
   placeholder: string;
   tags: Tag[];
   setTags: React.Dispatch<React.SetStateAction<Tag[]>>;

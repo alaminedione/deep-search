@@ -1,10 +1,9 @@
-import { Label } from "@/components/ui/label";
 import { TagInput } from "emblor";
 import { useState } from "react";
 import { TInputTags } from "../types";
 
 
-export default function InputTags({ id, label, placeholder, tags, setTags }: TInputTags & React.HTMLAttributes<HTMLDivElement>) {
+export default function InputTags({ id, placeholder, tags, setTags }: TInputTags & React.HTMLAttributes<HTMLDivElement>) {
   const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
 
   return (
