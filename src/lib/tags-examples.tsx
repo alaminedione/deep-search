@@ -1,19 +1,16 @@
 import { Tag } from "emblor";
 const tagsSites: Tag[] = [
+];
+const tagsWords: Tag[] = [
   {
     id: "1",
-    text: "example.com",
+    text: "albert",
   },
   {
     id: "2",
-    text: ".com",
+    text: "camus"
   },
-  {
-    id: "3",
-    text: ".org"
-  }
-];
-const tagsWords: Tag[] = [
+
 ];
 const tagsFileType: Tag[] = [
   {
@@ -28,11 +25,7 @@ const tagsFileType: Tag[] = [
 const tagsWordsInTitle: Tag[] = [
   {
     id: "1",
-    text: "l'étranger",
-  },
-  {
-    id: "2",
-    text: "albert camus ",
+    text: "étranger",
   },
 ];
 const tagsWordsInUrl: Tag[] = [];
