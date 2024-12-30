@@ -8,7 +8,7 @@ export type IconProps = React.HTMLAttributes<SVGElement>;
 export function DockBottom({ searchEngine, setSearchEngine }: propsSettingSearchEngine) {
   return (
     <div className="relative" >
-      <Dock direction="middle">
+      <Dock direction="middle" className="mt-0">
         <DockIcon>
           <a href="https://github.com/alaminedione/deep-search" target="_blank" rel="noreferrer">
             <Icons.gitHub className="size-6" />

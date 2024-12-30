@@ -103,12 +103,10 @@ const App = () => {
           <InputTags id='filetypes' placeholder="Types de fichiers recherchés (ex: pdf, docx, mp4, png)" tags={TagsFileType} setTags={setExampleTagsFileType} />
           <InputTags id="intitle" placeholder="Mots à inclure dans le titre (ex: guide, tutoriel)" tags={TagsWordsInTitle} setTags={setExampleTagsWordsInTitle} />
           <InputTags id="inurl" placeholder="Mots à inclure dans l'URL (ex: blog, article)" tags={TagsWordsInUrl} setTags={setExampleTagsWordsInUrl} />
-          <div className="flex items-center mt-3 gap-3">
+          <div className='flex items-center gap-2'>
             <Button className="ml-1 w-min" onClick={search}>search</Button>
             <Button variant={'outline'} onClick={deleteAllTags}>effacer tout</Button>
           </div>
-        </div>
-        <div className='flex justify-end items-center'>
           <DockBottom searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
         </div>
       </>
