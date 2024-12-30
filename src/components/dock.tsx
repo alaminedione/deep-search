@@ -1,13 +1,9 @@
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { SettingApi } from "./settings-api";
 import SettingSearchEngin from "./setting-search-engin";
-import { propsSettingSearchEngine } from "./setting-search-engin";
+import { propsSettingSearchEngine } from "@/types";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
-
-
-
-
 
 export function DockBottom({ searchEngine, setSearchEngine }: propsSettingSearchEngine) {
   return (

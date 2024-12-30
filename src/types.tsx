@@ -1,5 +1,4 @@
-import React from 'react'
-
+import { SetStateAction } from "react";
 import { Tag } from "emblor";
 export type InputEndAddon = {
   addon: string;
@@ -20,3 +19,7 @@ export type SearchBarProps = {
   searchEngine: string;
 };
 
+export interface propsSettingSearchEngine {
+  searchEngine: TSearchEngine,
+  setSearchEngine: React.Dispatch<SetStateAction<TSearchEngine>>
+}
