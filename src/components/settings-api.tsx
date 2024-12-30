@@ -17,7 +17,7 @@ import { useSettingApi } from "../contexts/settingApi"
 
 export function SettingApi() {
 
-  const { apikey, setApikey, endpoint, setEndpoint, modele, setModele } = useSettingApi()
+  const { apikey, setApikey, endpoint, setEndpoint, modele, setModele, setConfigured } = useSettingApi()
 
   useEffect(() => {
     const storedApikey = localStorage.getItem("apikey");
@@ -32,24 +32,55 @@ export function SettingApi() {
     if (storedModele) {
       setModele(storedModele as string);
     }
-  }, [setApikey, setEndpoint, setModele]);
+
+    const storedConfigured = localStorage.getItem("configured");
+    if (storedConfigured) {
+      setConfigured(storedConfigured === "true");
+    }
+  }, []);
 
 
-  function save() {
-    if (apikey === '' || endpoint === '') {
+
+  const API_KEY = "apikey";
+  const ENDPOINT_KEY = "endpoint";
+  const MODELE_KEY = "modele";
+  const CONFIGURED_KEY = "configured";
+
+  function saveApiConfiguration() {
+    const trimmedApiKey = apikey.trim();
+    const trimmedEndpoint = endpoint.trim();
+    const trimmedModele = modele.trim();
+
+    if (trimmedApiKey === '' || trimmedEndpoint === '') {
+      setConfigured(false);
+      localStorage.setItem(CONFIGURED_KEY, "false");
+    }
+
+    try {
+      localStorage.setItem(API_KEY, trimmedApiKey);
+      localStorage.setItem(ENDPOINT_KEY, trimmedEndpoint);
+      localStorage.setItem(MODELE_KEY, trimmedModele);
+      setApikey(trimmedApiKey);
+      setEndpoint(trimmedEndpoint);
+      setModele(trimmedModele);
+
+
+      localStorage.setItem(CONFIGURED_KEY, "true");
+      setConfigured(true);
+
+      console.log("saved");
+
+      toast({
+        title: "Paramètres sauvegardés",
+        description: "Les champs apikey et endpoint sont obligatoires pour une configuration valide",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde dans localStorage :", error);
       toast({
         title: "Error",
-        description: "les champs apikey et endpoint sont vides",
+        description: "Une erreur est survenue lors de la sauvegarde.",
       });
     }
-    localStorage.setItem("apikey", apikey);
-    localStorage.setItem("endpoint", endpoint);
-    localStorage.setItem("modele", modele);
-    console.log("saved")
-    toast({
-      title: "Saved",
-      description: "Les paramètres ont été sauvegardés",
-    });
   }
   return (
     <Dialog>
@@ -93,7 +124,7 @@ export function SettingApi() {
 
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={save}>Save changes</Button>
+          <Button type="submit" onClick={saveApiConfiguration}>Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -8,7 +8,7 @@ import { useSettingApi } from "../contexts/settingApi";
 
 export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBarProps) {
 
-  const { apikey, endpoint, modele } = useSettingApi()
+  const { apikey, endpoint, modele, configured } = useSettingApi()
 
   const { toast } = useToast()
 
@@ -68,8 +68,15 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
 
     if (!searchText) {
       toast({
-        title: "Error",
-        description: "Le texte de recherche est vide ou invalide.",
+        title: "champ de recherche vide",
+        description: "veuillez entrer votre recherche",
+      });
+      return;
+    }
+    if (!configured) {
+      toast({
+        title: "Configurer votre API d'abord",
+        description: "cliquez sur le boutton API tout en bas de la page pour la configurer",
       });
       return;
     }
@@ -80,15 +87,15 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
       .then(response => {
         if (response === undefined) {
           toast({
-            title: "Error",
-            description: "Something went wrong. No response from the server.",
+            title: "Quelque chose s'est mal passé.",
+            description: " Aucune réponse du serveur.",
           });
           throw new Error('Network response was not ok');
         }
         if (!response.ok) {
           toast({
-            title: "Error",
-            description: `Something went wrong. Error: ${response.status}: ${response.statusText}`,
+            title: " Quelque chose s'est mal passé.",
+            description: `Erreur: ${response.status}: ${response.statusText}`,
           });
           throw new Error('Network response was not ok');
         }
@@ -97,14 +104,12 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
       .then(data => {
         let content;
 
-        // Extraction du contenu de la réponse
         if (data.choices && data.choices.length > 0) {
           content = data.choices[0]?.message.content;
         } else if (data.message && data.message.content) {
           content = data.message.content;
         }
 
-        // Si du contenu a été trouvé, ouvrir une nouvelle fenêtre avec les résultats de recherche
         if (content) {
           console.log(content);
           const encodedContent = encodeURIComponent(content);
@@ -120,8 +125,8 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
       })
       .catch(error => {
         toast({
-          title: "Error",
-          description: `Something went wrong. `,
+          title: "Erreur , Quelque chose s'est mal passé.",
+          description: `verifier que votre API est bien configurée. Erreur: ${error}`,
         });
         console.error("Fetch error:", error);
 
@@ -130,6 +135,8 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
         setIsSubmitting(false);
       });
     setSearchText("");
+
+    console.log("configuration: ", apikey, endpoint, modele);
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {

@@ -8,6 +8,8 @@ export interface PropsSettingApi {
   setEndpoint: React.Dispatch<React.SetStateAction<string>>;
   modele: string;
   setModele: React.Dispatch<React.SetStateAction<string>>;
+  configured: boolean;
+  setConfigured: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 type PropsSettingApiProvider = {
@@ -22,6 +24,7 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
   const [apikey, setApikey] = useState('');
   const [endpoint, setEndpoint] = useState('');
   const [modele, setModele] = useState('');
+  const [configured, setConfigured] = useState(false);
 
   // Création de l'objet settingsApi
   const settingsApi: PropsSettingApi = {
@@ -31,7 +34,10 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
     setEndpoint,
     modele,
     setModele,
+    configured,
+    setConfigured,
   };
+
 
   return (
     <SettingApiContext.Provider value={settingsApi}>

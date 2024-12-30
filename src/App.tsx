@@ -9,7 +9,6 @@ import { TSearchEngine } from "./types";
 import { tagsSites, tagsWords, tagsFileType, tagsWordsInTitle, tagsWordsInUrl, tagsSitesToExclude } from "./lib/tags-examples";
 import { SettingApiProvider } from "./contexts/settingApi";
 
-
 const App = () => {
 
   const [TagsFileType, setExampleTagsFileType] = useState<Tag[]>(tagsFileType);
@@ -27,7 +26,9 @@ const App = () => {
     if (storedValue) {
       setSearchEngine(storedValue as TSearchEngine);
     }
-  }, [setSearchEngine]);
+  }, []);
+
+
 
   function deleteAllTags() {
     setExampleTagsSites([])
