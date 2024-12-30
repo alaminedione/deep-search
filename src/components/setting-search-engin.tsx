@@ -2,7 +2,7 @@ import { SetStateAction } from "react";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "./ui/select"
 import { TSearchEngine } from "@/types"
 
-export interface propsSettingSearchEngine {
+export type propsSettingSearchEngine = {
   searchEngine: TSearchEngine,
   setSearchEngine: React.Dispatch<SetStateAction<TSearchEngine>>
 }
