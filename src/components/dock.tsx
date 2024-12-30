@@ -2,10 +2,21 @@ import { Dock, DockIcon } from "@/components/ui/dock";
 import { SettingApi } from "./settings-api";
 import SettingSearchEngin from "./setting-search-engin";
 import { propsSettingSearchEngine } from "@/types";
+import { useTheme } from "./theme-provider";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "./ui/select"
+
+
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
 export function DockBottom({ searchEngine, setSearchEngine }: propsSettingSearchEngine) {
+
+  const { theme, setTheme } = useTheme()
+
+  function handleTheme(value: string) {
+    setTheme(value as 'dark' | 'light' | 'system')
+    localStorage.setItem('theme', value)
+  }
   return (
     <div className="relative" >
       <Dock direction="middle" className="mt-0">
@@ -17,9 +28,21 @@ export function DockBottom({ searchEngine, setSearchEngine }: propsSettingSearch
         <DockIcon>
           <SettingApi />
         </DockIcon>
-        <DockIcon className="m-5">
+        <div>
           <SettingSearchEngin searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
-        </DockIcon>
+        </div>
+        <div className='flex items-center justify-center gap-2 '>
+          <Select value={theme} onValueChange={handleTheme} >
+            <SelectTrigger className="" >
+              Theme
+            </SelectTrigger>
+            <SelectContent id="theme">
+              <SelectItem value="dark">dark</SelectItem>
+              <SelectItem value="light">light</SelectItem>
+              <SelectItem value="system">system</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </Dock>
     </div>
   );
