@@ -1,13 +1,15 @@
-import React, { PropsWithChildren, useRef } from "react";
+"use client";
+
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   motion,
+  MotionProps,
   MotionValue,
   useMotionValue,
   useSpring,
   useTransform,
-  MotionProps,
 } from "framer-motion";
+import React, { PropsWithChildren, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -43,12 +45,11 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
   ) => {
     const mouseX = useMotionValue(Infinity);
 
-
     const renderChildren = () => {
       return React.Children.map(children, (child) => {
-        if (React.isValidElement(child) && child.type === DockIcon) {
+        if (React.isValidElement<DockIconProps>(child) && child.type === DockIcon) {
           return React.cloneElement(child, {
-            ...(typeof child.props === 'object' ? child.props : {}),
+            ...child.props,
             mouseX: mouseX,
             size: iconSize,
             magnification: iconMagnification,
@@ -58,6 +59,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
         return child;
       });
     };
+
 
     return (
       <motion.div
