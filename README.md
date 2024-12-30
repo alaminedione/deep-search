@@ -6,11 +6,9 @@ Deep Search est une application web conçue pour effectuer des recherches avanc�
 
 ## 📦 Installation
 
-   ```bash
-   git clone https://github.com/alaminedione/deep-search.git
-   cd deep-search
-   npm install
-   npm run dev
-   ```
-
-lien du site: https://deep-search.vercel.app/
+```bash
+git clone https://github.com/alaminedione/deep-search.git
+cd deep-search
+npm install
+npm run dev
+```
