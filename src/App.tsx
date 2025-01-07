@@ -97,15 +97,51 @@ const App = () => {
         </header>
 
         <div className="options flex flex-col gap-3">
-          <InputTags id='websites' placeholder='Entrez les sites ou domaines à rechercher (ex: example.com, .org)' tags={TagsSites} setTags={setExampleTagsSites} />
-          <InputTags id='site-toExclude' placeholder='Sites à exclure des résultats (ex: site1.com, site2.com)' tags={TagsSitesToExclude} setTags={setExampleTagsSitesToExclude} />
-          <InputTags id='word-toExclude' placeholder='Mots à réduire dans les résultats (ex: -publicité, -spam)' tags={TagsWords} setTags={setExampleTagsWords} />
-          <InputTags id='filetypes' placeholder="Types de fichiers recherchés (ex: pdf, docx, mp4, png)" tags={TagsFileType} setTags={setExampleTagsFileType} />
-          <InputTags id="intitle" placeholder="Mots à inclure dans le titre (ex: guide, tutoriel)" tags={TagsWordsInTitle} setTags={setExampleTagsWordsInTitle} />
-          <InputTags id="inurl" placeholder="Mots à inclure dans l'URL (ex: blog, article)" tags={TagsWordsInUrl} setTags={setExampleTagsWordsInUrl} />
+
+          <InputTags
+            id='websites'
+            placeholder='Enter websites (e.g. example.com, .org)'
+            tags={TagsSites}
+            setTags={setExampleTagsSites}
+          />
+
+          <InputTags
+            id='site-toExclude'
+            placeholder='Exclude sites (e.g. site1.com, site2.com)'
+            tags={TagsSitesToExclude}
+            setTags={setExampleTagsSitesToExclude}
+          />
+
+          <InputTags
+            id='word-toExclude'
+            placeholder='Words to exclude (e.g. -advertising, -spam)'
+            tags={TagsWords}
+            setTags={setExampleTagsWords}
+          />
+
+          <InputTags
+            id='filetypes'
+            placeholder="File types (e.g. pdf, docx, mp4, png)"
+            tags={TagsFileType}
+            setTags={setExampleTagsFileType}
+          />
+
+          <InputTags
+            id="intitle"
+            placeholder="Include words in title (e.g. guide, tutorial)"
+            tags={TagsWordsInTitle}
+            setTags={setExampleTagsWordsInTitle}
+          />
+
+          <InputTags
+            id="inurl"
+            placeholder="Include words in URL (e.g. blog, article)"
+            tags={TagsWordsInUrl}
+            setTags={setExampleTagsWordsInUrl}
+          />
           <div className='flex items-center gap-2'>
             <Button className="ml-1 w-min" onClick={search}>search</Button>
-            <Button variant={'outline'} onClick={deleteAllTags}>effacer tout</Button>
+            <Button variant={'outline'} onClick={deleteAllTags}>delete all tags</Button>
           </div>
           <DockBottom searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
         </div>
