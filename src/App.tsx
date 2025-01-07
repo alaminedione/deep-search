@@ -114,14 +114,14 @@ const App = () => {
 
           <InputTags
             id='word-toExclude'
-            placeholder='Words to exclude (e.g. -advertising, -spam)'
+            placeholder='Words to exclude in the text (e.g. -advertising, -spam)'
             tags={TagsWords}
             setTags={setExampleTagsWords}
           />
 
           <InputTags
             id='filetypes'
-            placeholder="File types (e.g. pdf, docx, mp4, png)"
+            placeholder="Filetypes (e.g. pdf, docx, mp4, png)"
             tags={TagsFileType}
             setTags={setExampleTagsFileType}
           />
