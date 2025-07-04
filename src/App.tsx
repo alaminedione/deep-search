@@ -16,6 +16,7 @@ import { SmartSearchSuggestions } from "./components/smart-search-suggestions";
 import { HomeStats } from "./components/home-stats";
 import { QuickStartGuide } from "./components/quick-start-guide";
 import { FeatureShowcase } from "./components/feature-showcase";
+import { HeroSection } from "./components/hero-section";
 
 interface SearchHistory {
   id: string;
@@ -367,6 +368,9 @@ const App = () => {
         {currentView === 'home' ? (
           /* Home View */
           <div className="max-w-6xl mx-auto px-4 space-y-12">
+            {/* Hero Section */}
+            <HeroSection onStartSearch={() => setCurrentView('search')} />
+            
             {/* Home Statistics */}
             <HomeStats searchHistory={searchHistory} />
             

@@ -1,212 +1,186 @@
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
+import { motion } from "framer-motion";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 import { 
-  Search, 
   FileText, 
   Image, 
   Video, 
-  Code, 
-  BookOpen, 
-  Newspaper,
-  Lightbulb,
-  Zap
-} from 'lucide-react';
+  ArrowRight,
+  Lightbulb
+} from "lucide-react";
 
 interface QuickStartGuideProps {
   onApplyExample: (example: any) => void;
 }
 
-export const QuickStartGuide = ({ onApplyExample }: QuickStartGuideProps) => {
-  const searchExamples = [
-    {
-      title: "Recherche de documents PDF",
-      description: "Trouvez des documents PDF sur un sujet spécifique",
-      icon: FileText,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      example: {
-        searchText: "intelligence artificielle",
-        tags: {
-          fileTypes: ["pdf"],
-          sites: ["edu", "org"]
-        }
-      }
+const quickExamples = [
+  {
+    id: 1,
+    title: "Documents PDF",
+    description: "Trouvez des guides et manuels",
+    icon: FileText,
+    color: "text-red-500",
+    bgColor: "bg-red-50 dark:bg-red-950/20",
+    searchText: "guide installation",
+    tags: {
+      fileTypes: ["pdf"]
     },
-    {
-      title: "Images haute résolution",
-      description: "Recherchez des images de qualité professionnelle",
-      icon: Image,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      example: {
-        searchText: "paysage montagne",
-        tags: {
-          fileTypes: ["jpg", "png"],
-          wordsInTitle: ["HD", "4K", "high resolution"]
-        }
-      }
+    tip: "Parfait pour les manuels techniques et guides officiels"
+  },
+  {
+    id: 2,
+    title: "Images HD",
+    description: "Recherchez des images haute qualité",
+    icon: Image,
+    color: "text-blue-500",
+    bgColor: "bg-blue-50 dark:bg-blue-950/20",
+    searchText: "wallpaper 4k",
+    tags: {
+      fileTypes: ["jpg", "png"],
+      sites: ["unsplash.com", "pexels.com"]
     },
-    {
-      title: "Tutoriels vidéo",
-      description: "Trouvez des tutoriels vidéo détaillés",
-      icon: Video,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      example: {
-        searchText: "programmation Python",
-        tags: {
-          sites: ["youtube.com", "vimeo.com"],
-          wordsInTitle: ["tutorial", "guide", "cours"]
-        }
-      }
+    tip: "Utilisez des sites spécialisés pour de meilleures images"
+  },
+  {
+    id: 3,
+    title: "Tutoriels Vidéo",
+    description: "Apprenez avec des vidéos",
+    icon: Video,
+    color: "text-green-500",
+    bgColor: "bg-green-50 dark:bg-green-950/20",
+    searchText: "tutoriel programmation",
+    tags: {
+      sites: ["youtube.com"],
+      wordsInTitle: ["tutorial", "guide", "how to"]
     },
-    {
-      title: "Code source",
-      description: "Recherchez du code source et des exemples",
-      icon: Code,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      example: {
-        searchText: "React hooks",
-        tags: {
-          sites: ["github.com", "stackoverflow.com"],
-          fileTypes: ["js", "jsx", "ts", "tsx"]
-        }
-      }
-    },
-    {
-      title: "Articles académiques",
-      description: "Trouvez des publications scientifiques",
-      icon: BookOpen,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-      example: {
-        searchText: "machine learning",
-        tags: {
-          sites: ["scholar.google.com", "arxiv.org", "researchgate.net"],
-          fileTypes: ["pdf"],
-          wordsInTitle: ["research", "study", "analysis"]
-        }
-      }
-    },
-    {
-      title: "Actualités récentes",
-      description: "Recherchez les dernières nouvelles",
-      icon: Newspaper,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      example: {
-        searchText: "technologie 2024",
-        tags: {
-          sites: ["news.google.com", "lemonde.fr", "figaro.fr"],
-          wordsInUrl: ["news", "actualite", "article"]
-        }
-      }
-    }
-  ];
+    tip: "Filtrez par durée et qualité pour de meilleurs résultats"
+  }
+];
 
-  const tips = [
-    {
-      icon: Lightbulb,
-      title: "Utilisez les guillemets",
-      description: "Pour rechercher une phrase exacte, entourez-la de guillemets"
-    },
-    {
-      icon: Zap,
-      title: "Combinez les opérateurs",
-      description: "Mélangez sites, types de fichiers et mots-clés pour des résultats précis"
-    },
-    {
-      icon: Search,
-      title: "Explorez l'historique",
-      description: "Vos recherches précédentes peuvent vous donner des idées pour de nouvelles requêtes"
-    }
-  ];
-
+export function QuickStartGuide({ onApplyExample }: QuickStartGuideProps) {
   return (
-    <div className="space-y-8">
-      {/* Welcome Section */}
+    <section className="py-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-4"
+        transition={{ duration: 0.6 }}
+        className="max-w-6xl mx-auto"
       >
-        <h2 className="text-3xl font-bold">Bienvenue dans Deep Search</h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Maîtrisez l'art de la recherche avancée avec nos outils intelligents et nos raccourcis prédéfinis.
-          Trouvez exactement ce que vous cherchez en quelques clics.
-        </p>
-      </motion.div>
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4"
+          >
+            <Lightbulb className="h-4 w-4" />
+            Démarrage rapide
+          </motion.div>
+          <motion.h2 
+            className="text-3xl md:text-4xl font-bold mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            Exemples de recherches populaires
+          </motion.h2>
+          <motion.p 
+            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            Cliquez sur un exemple pour l'appliquer instantanément et découvrir la puissance de Deep Search
+          </motion.p>
+        </div>
 
-      {/* Quick Examples */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-center">Exemples de recherche populaires</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {searchExamples.map((example, index) => (
-            <motion.div
-              key={example.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="h-full hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                    onClick={() => onApplyExample(example.example)}>
-                <CardHeader className="pb-3">
-                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${example.bgColor} mb-3 group-hover:scale-110 transition-transform`}>
-                    <example.icon className={`h-6 w-6 ${example.color}`} />
-                  </div>
-                  <CardTitle className="text-lg">{example.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {example.description}
-                  </p>
-                  <div className="space-y-2">
-                    <div className="text-xs font-medium text-muted-foreground">Exemple:</div>
-                    <div className="flex flex-wrap gap-1">
-                      <Badge variant="secondary" className="text-xs">
-                        {example.example.searchText}
-                      </Badge>
-                      {example.example.tags.fileTypes?.map(type => (
-                        <Badge key={type} variant="outline" className="text-xs">
-                          .{type}
-                        </Badge>
-                      ))}
-                      {example.example.tags.sites?.slice(0, 2).map(site => (
-                        <Badge key={site} variant="outline" className="text-xs">
-                          {site}
-                        </Badge>
-                      ))}
+        {/* Examples Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {quickExamples.map((example, index) => {
+            const IconComponent = example.icon;
+            return (
+              <motion.div
+                key={example.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+              >
+                <Card 
+                  className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-2 hover:border-primary/20"
+                  onClick={() => onApplyExample(example)}
+                >
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className={`p-3 rounded-lg ${example.bgColor}`}>
+                        <IconComponent className={`h-6 w-6 ${example.color}`} />
+                      </div>
+                      <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300" />
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                      {example.title}
+                    </CardTitle>
+                    <CardDescription className="text-base">
+                      {example.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-2">
+                        {example.tags.fileTypes && example.tags.fileTypes.map((type) => (
+                          <Badge key={type} variant="secondary" className="text-xs">
+                            .{type}
+                          </Badge>
+                        ))}
+                        {example.tags.sites && example.tags.sites.slice(0, 2).map((site) => (
+                          <Badge key={site} variant="outline" className="text-xs">
+                            {site}
+                          </Badge>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground italic">
+                        💡 {example.tip}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Tips Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="space-y-4"
-      >
-        <h3 className="text-xl font-semibold text-center">Conseils pour une recherche efficace</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {tips.map((tip) => (
-            <Card key={tip.title} className="text-center">
-              <CardContent className="pt-6">
-                <tip.icon className="h-8 w-8 mx-auto mb-3 text-primary" />
-                <h4 className="font-semibold mb-2">{tip.title}</h4>
-                <p className="text-sm text-muted-foreground">{tip.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Pro Tips */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-8 border"
+        >
+          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Lightbulb className="h-5 w-5 text-primary" />
+            Conseils pour optimiser vos recherches
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+            <div className="flex items-start gap-2">
+              <span className="text-primary font-semibold">•</span>
+              <span>Utilisez des guillemets pour rechercher une expression exacte</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-primary font-semibold">•</span>
+              <span>Combinez plusieurs opérateurs pour affiner vos résultats</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-primary font-semibold">•</span>
+              <span>Excluez des termes avec le signe moins (-) pour filtrer</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-primary font-semibold">•</span>
+              <span>Spécifiez des sites fiables pour des informations de qualité</span>
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
-    </div>
+    </section>
   );
-};
+}
