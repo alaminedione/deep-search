@@ -90,45 +90,45 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 max-w-4xl mx-auto"
         >
-          <Card className="border-2 hover:border-primary/20 transition-colors">
+          <Card className="border-2 hover:border-primary/20 transition-colors h-full">
             <CardHeader className="pb-4">
               <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 w-fit mb-3">
                 <Target className="h-6 w-6 text-blue-500" />
               </div>
-              <CardTitle className="text-lg">Recherche Précise</CardTitle>
+              <CardTitle className="text-lg break-words">Recherche Précise</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <CardDescription>
+              <CardDescription className="break-words text-wrap">
                 Utilisez les opérateurs avancés pour des résultats ultra-ciblés
               </CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:border-primary/20 transition-colors">
+          <Card className="border-2 hover:border-primary/20 transition-colors h-full">
             <CardHeader className="pb-4">
               <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20 w-fit mb-3">
                 <Sparkles className="h-6 w-6 text-purple-500" />
               </div>
-              <CardTitle className="text-lg">IA Intégrée</CardTitle>
+              <CardTitle className="text-lg break-words">IA Intégrée</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <CardDescription>
+              <CardDescription className="break-words text-wrap">
                 Suggestions intelligentes pour optimiser vos recherches
               </CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:border-primary/20 transition-colors">
+          <Card className="border-2 hover:border-primary/20 transition-colors h-full">
             <CardHeader className="pb-4">
               <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/20 w-fit mb-3">
                 <Zap className="h-6 w-6 text-green-500" />
               </div>
-              <CardTitle className="text-lg">Interface Intuitive</CardTitle>
+              <CardTitle className="text-lg break-words">Interface Intuitive</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <CardDescription>
+              <CardDescription className="break-words text-wrap">
                 Simplicité et puissance réunies dans une interface moderne
               </CardDescription>
             </CardContent>

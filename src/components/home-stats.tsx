@@ -103,7 +103,7 @@ export const HomeStats = ({ searchHistory }: HomeStatsProps) => {
   return (
     <div className="space-y-6">
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <motion.div
             key={stat.title}
@@ -111,13 +111,13 @@ export const HomeStats = ({ searchHistory }: HomeStatsProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="text-center hover:shadow-md transition-shadow">
+            <Card className="text-center hover:shadow-md transition-shadow h-full">
               <CardContent className="pt-6">
                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${stat.bgColor} mb-3`}>
                   <stat.icon className={`h-6 w-6 ${stat.color}`} />
                 </div>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-sm text-muted-foreground">{stat.title}</p>
+                <div className="text-2xl font-bold break-words">{stat.value}</div>
+                <p className="text-sm text-muted-foreground break-words">{stat.title}</p>
               </CardContent>
             </Card>
           </motion.div>

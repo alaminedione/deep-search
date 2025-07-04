@@ -96,7 +96,7 @@ export function QuickStartGuide({ onApplyExample }: QuickStartGuideProps) {
         </div>
 
         {/* Examples Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto">
           {quickExamples.map((example, index) => {
             const IconComponent = example.icon;
             return (
@@ -107,7 +107,7 @@ export function QuickStartGuide({ onApplyExample }: QuickStartGuideProps) {
                 transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
               >
                 <Card 
-                  className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-2 hover:border-primary/20"
+                  className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-2 hover:border-primary/20 h-full"
                   onClick={() => onApplyExample(example)}
                 >
                   <CardHeader className="pb-4">
@@ -117,10 +117,10 @@ export function QuickStartGuide({ onApplyExample }: QuickStartGuideProps) {
                       </div>
                       <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300" />
                     </div>
-                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                    <CardTitle className="text-xl group-hover:text-primary transition-colors break-words">
                       {example.title}
                     </CardTitle>
-                    <CardDescription className="text-base">
+                    <CardDescription className="text-base break-words text-wrap">
                       {example.description}
                     </CardDescription>
                   </CardHeader>

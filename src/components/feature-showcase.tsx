@@ -82,7 +82,7 @@ export function FeatureShowcase({ onStartTour }: FeatureShowcaseProps) {
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
@@ -97,15 +97,15 @@ export function FeatureShowcase({ onStartTour }: FeatureShowcaseProps) {
                     <div className={`p-4 rounded-xl ${feature.bgColor} w-fit mb-4`}>
                       <IconComponent className={`h-8 w-8 ${feature.color}`} />
                     </div>
-                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                    <CardTitle className="text-xl group-hover:text-primary transition-colors break-words">
                       {feature.title}
                     </CardTitle>
-                    <CardDescription className="text-base">
+                    <CardDescription className="text-base break-words text-wrap">
                       {feature.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground break-words text-wrap">
                       {feature.details}
                     </p>
                   </CardContent>

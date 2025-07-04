@@ -159,18 +159,18 @@ export function SmartSearchSuggestions({ onApplyShortcut }: SmartSearchSuggestio
       </div>
 
       {/* Shortcuts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 max-w-5xl mx-auto">
         {filteredShortcuts.map((shortcut) => (
           <Card 
             key={shortcut.id} 
-            className="cursor-pointer hover:shadow-md transition-shadow"
+            className="cursor-pointer hover:shadow-md transition-shadow h-full"
             onClick={() => handleShortcutClick(shortcut)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
                   {shortcut.icon}
-                  <CardTitle className="text-base">{shortcut.title}</CardTitle>
+                  <CardTitle className="text-base break-words">{shortcut.title}</CardTitle>
                 </div>
                 <div className="flex items-center gap-1">
                   <div 
@@ -180,7 +180,7 @@ export function SmartSearchSuggestions({ onApplyShortcut }: SmartSearchSuggestio
                   <span className="text-xs text-muted-foreground">{shortcut.popularity}%</span>
                 </div>
               </div>
-              <CardDescription className="text-sm">
+              <CardDescription className="text-sm break-words text-wrap">
                 {shortcut.description}
               </CardDescription>
             </CardHeader>
