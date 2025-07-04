@@ -1,15 +1,122 @@
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, History, TrendingUp } from "lucide-react";
 import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { useToast } from "../hooks/use-toast"
 import { SearchBarProps } from "../types";
 import { useSettingApi } from "../contexts/settingApi";
+import { AdvancedSearch } from "./advanced-search";
 
-export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBarProps) {
+export function SearchBar({ setSearchText, searchText, searchEngine, currentSearchData, onApplyAdvancedSearch }: SearchBarProps) {
   const { apikey, endpoint, modele, configured } = useSettingApi()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const suggestionRef = useRef<HTMLDivElement>(null);
+
+  // Load search history from localStorage
+  useEffect(() => {
+    const storedHistory = localStorage.getItem("searchTermHistory");
+    if (storedHistory) {
+      try {
+        setSearchHistory(JSON.parse(storedHistory));
+      } catch (error) {
+        console.error("Error loading search history:", error);
+      }
+    }
+  }, []);
+
+  // Save search term to history
+  const addToSearchHistory = useCallback((term: string) => {
+    if (term.trim()) {
+      setSearchHistory(prev => {
+        const newHistory = [term, ...prev.filter(h => h !== term)].slice(0, 10);
+        localStorage.setItem("searchTermHistory", JSON.stringify(newHistory));
+        return newHistory;
+      });
+    }
+  }, []);
+
+  // Generate suggestions based on input
+  const generateSuggestions = useCallback((input: string) => {
+    if (!input.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const commonSearchTerms = [
+      "tutorial", "guide", "documentation", "example", "template",
+      "framework", "library", "api", "github", "stackoverflow",
+      "python", "javascript", "react", "nodejs", "machine learning",
+      "artificial intelligence", "data science", "web development",
+      "mobile development", "cybersecurity", "blockchain", "cloud computing"
+    ];
+
+    const historyMatches = searchHistory.filter(term => 
+      term.toLowerCase().includes(input.toLowerCase())
+    );
+
+    const termMatches = commonSearchTerms.filter(term => 
+      term.toLowerCase().includes(input.toLowerCase())
+    );
+
+    const allSuggestions = [...historyMatches, ...termMatches]
+      .filter((term, index, arr) => arr.indexOf(term) === index)
+      .slice(0, 8);
+
+    setSuggestions(allSuggestions);
+  }, [searchHistory]);
+
+  // Handle input change with suggestions
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
+    generateSuggestions(value);
+    setShowSuggestions(true);
+    setSelectedSuggestionIndex(-1);
+  }, [setSearchText, generateSuggestions]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+        break;
+      case 'Enter':
+        if (selectedSuggestionIndex >= 0) {
+          e.preventDefault();
+          setSearchText(suggestions[selectedSuggestionIndex]);
+          setShowSuggestions(false);
+          addToSearchHistory(suggestions[selectedSuggestionIndex]);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+    }
+  }, [showSuggestions, suggestions, selectedSuggestionIndex, setSearchText, addToSearchHistory]);
+
+  // Handle suggestion click
+  const handleSuggestionClick = useCallback((suggestion: string) => {
+    setSearchText(suggestion);
+    setShowSuggestions(false);
+    addToSearchHistory(suggestion);
+  }, [setSearchText, addToSearchHistory]);
 
   const placeholders = [
     "Recherchez avec l'IA ou les opérateurs Dorks...",
@@ -77,9 +184,7 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
     }
   }, [apikey, endpoint, modele, toast]);
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-  }, [setSearchText]);
+
 
   const executeAISearch = useCallback(async () => {
     if (!searchText.trim()) {
@@ -101,6 +206,7 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
     }
 
     setIsSubmitting(true);
+    addToSearchHistory(searchText); // Add to history before processing
 
     try {
       const data = await fetchQuery(searchText);
@@ -144,6 +250,7 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
       });
 
       setSearchText(""); // Clear after successful search
+      setShowSuggestions(false);
 
     } catch (error) {
       console.error("AI Search error:", error);
@@ -172,22 +279,74 @@ export function SearchBar({ setSearchText, searchText, searchEngine }: SearchBar
     } finally {
       setIsSubmitting(false);
     }
-  }, [searchText, configured, fetchQuery, searchEngine, toast, setSearchText]);
+  }, [searchText, configured, fetchQuery, searchEngine, toast, setSearchText, addToSearchHistory]);
 
   const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setShowSuggestions(false);
     executeAISearch();
   }, [executeAISearch]);
 
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionRef.current && !suggestionRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <div className="flex justify-center gap-3 mb-6 w-full items-center max-w-4xl mx-auto px-4">
-      <div className="flex-1 max-w-2xl">
+      <div className="flex-1 max-w-2xl relative" ref={suggestionRef}>
         <PlaceholdersAndVanishInput
           placeholders={placeholders}
-          onChange={handleChange}
+          onChange={handleInputChange}
           onSubmit={onSubmit}
+          onKeyDown={handleKeyDown}
         />
+        
+        {/* Suggestions Dropdown */}
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
+            {suggestions.map((suggestion, index) => (
+              <div
+                key={suggestion}
+                className={`px-4 py-2 cursor-pointer transition-colors ${
+                  index === selectedSuggestionIndex 
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
+                    : 'hover:bg-gray-50 dark:hover:bg-zinc-700'
+                }`}
+                onClick={() => handleSuggestionClick(suggestion)}
+              >
+                <div className="flex items-center gap-2">
+                  {searchHistory.includes(suggestion) ? (
+                    <History className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <TrendingUp className="h-4 w-4 text-gray-400" />
+                  )}
+                  <span className="text-sm">{suggestion}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      <AdvancedSearch 
+        onApplySearch={(searchData) => {
+          if (onApplyAdvancedSearch) {
+            onApplyAdvancedSearch(searchData);
+          }
+        }}
+        currentSearchData={currentSearchData || {
+          searchText,
+          tags: {}
+        }}
+      />
 
       <Button 
         className="shrink-0 min-w-[140px]" 

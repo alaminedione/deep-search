@@ -7,10 +7,12 @@ export function PlaceholdersAndVanishInput({
   placeholders,
   onChange,
   onSubmit,
+  onKeyDown,
 }: {
   placeholders: string[];
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
 
@@ -149,7 +151,13 @@ export function PlaceholdersAndVanishInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !animating) {
+    // Call external onKeyDown first if provided
+    if (onKeyDown) {
+      onKeyDown(e);
+    }
+    
+    // Only handle Enter if not handled by external handler
+    if (e.key === "Enter" && !animating && !e.defaultPrevented) {
       vanishAndSubmit();
     }
   };

@@ -9,14 +9,20 @@ import { TSearchEngine } from "./types";
 import { tagsSites, tagsWords, tagsFileType, tagsWordsInTitle, tagsWordsInUrl, tagsSitesToExclude } from "./lib/tags-examples";
 import { SettingApiProvider } from "./contexts/settingApi";
 import { useToast } from "./hooks/use-toast";
-import { Copy, Download, Share2, History, Trash2 } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./components/ui/accordion";
+import { Copy, Share2, Trash2 } from "lucide-react";
+
+import { EnhancedSearchHistory } from "./components/enhanced-search-history";
+import { SmartSearchSuggestions } from "./components/smart-search-suggestions";
 
 interface SearchHistory {
   id: string;
   query: string;
   timestamp: Date;
   searchEngine: TSearchEngine;
+  isFavorite?: boolean;
+  tags?: string[];
+  category?: string;
+  notes?: string;
 }
 
 const App = () => {
@@ -215,6 +221,56 @@ const App = () => {
     });
   }, [toast]);
 
+  const applySearchShortcut = useCallback((shortcut: any) => {
+    // Apply shortcut query
+    if (shortcut.query) {
+      setSearchText(shortcut.query);
+    }
+
+    // Apply shortcut tags
+    if (shortcut.tags) {
+      if (shortcut.tags.sites) {
+        const siteTags = shortcut.tags.sites.map((site: string) => ({ 
+          id: Date.now().toString() + Math.random(), 
+          text: site 
+        }));
+        setExampleTagsSites(prev => [...prev, ...siteTags]);
+      }
+
+      if (shortcut.tags.fileTypes) {
+        const fileTypeTags = shortcut.tags.fileTypes.map((type: string) => ({ 
+          id: Date.now().toString() + Math.random(), 
+          text: type 
+        }));
+        setExampleTagsFileType(prev => [...prev, ...fileTypeTags]);
+      }
+
+      if (shortcut.tags.operators) {
+        // Parse operators and apply them to appropriate fields
+        shortcut.tags.operators.forEach((operator: string) => {
+          if (operator.startsWith('intitle:')) {
+            const title = operator.replace('intitle:', '').replace(/"/g, '');
+            const titleTag = { id: Date.now().toString() + Math.random(), text: title };
+            setExampleTagsWordsInTitle(prev => [...prev, titleTag]);
+          } else if (operator.startsWith('inurl:')) {
+            const url = operator.replace('inurl:', '').replace(/"/g, '');
+            const urlTag = { id: Date.now().toString() + Math.random(), text: url };
+            setExampleTagsWordsInUrl(prev => [...prev, urlTag]);
+          } else if (operator.startsWith('-site:')) {
+            const site = operator.replace('-site:', '');
+            const siteTag = { id: Date.now().toString() + Math.random(), text: site };
+            setExampleTagsSitesToExclude(prev => [...prev, siteTag]);
+          }
+        });
+      }
+    }
+
+    toast({
+      title: "Raccourci appliqué",
+      description: `Le raccourci "${shortcut.title}" a été appliqué avec succès.`,
+    });
+  }, [setSearchText, setExampleTagsSites, setExampleTagsFileType, setExampleTagsWordsInTitle, setExampleTagsWordsInUrl, setExampleTagsSitesToExclude, toast]);
+
   return (
     <SettingApiProvider>
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
@@ -232,7 +288,29 @@ const App = () => {
           <SearchBar 
             setSearchText={setSearchText} 
             searchText={searchText} 
-            searchEngine={searchEngine} 
+            searchEngine={searchEngine}
+            currentSearchData={{
+              searchText,
+              tags: {
+                sites: TagsSites.map(tag => tag.text),
+                excludeSites: TagsSitesToExclude.map(tag => tag.text),
+                fileTypes: TagsFileType.map(tag => tag.text),
+                wordsInTitle: TagsWordsInTitle.map(tag => tag.text),
+                wordsInUrl: TagsWordsInUrl.map(tag => tag.text),
+                excludeWords: TagsWords.map(tag => tag.text)
+              }
+            }}
+            onApplyAdvancedSearch={(searchData) => {
+              setSearchText(searchData.searchText || "");
+              if (searchData.tags) {
+                setExampleTagsSites(searchData.tags.sites?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                setExampleTagsSitesToExclude(searchData.tags.excludeSites?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                setExampleTagsFileType(searchData.tags.fileTypes?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                setExampleTagsWordsInTitle(searchData.tags.wordsInTitle?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                setExampleTagsWordsInUrl(searchData.tags.wordsInUrl?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                setExampleTagsWords(searchData.tags.excludeWords?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+              }
+            }}
           />
         </header>
 
@@ -321,51 +399,21 @@ const App = () => {
             </Button>
           </div>
 
-          {/* Search History */}
-          {searchHistory.length > 0 && (
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="history">
-                <AccordionTrigger className="text-left">
-                  <div className="flex items-center gap-2">
-                    <History className="h-4 w-4" />
-                    Historique des recherches ({searchHistory.length})
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-end gap-2 mb-4">
-                      <Button variant="outline" size="sm" onClick={exportHistory}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Exporter
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={clearHistory}>
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Effacer
-                      </Button>
-                    </div>
-                    {searchHistory.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <div className="flex-1 min-w-0">
-                          <code className="text-sm block truncate">{item.query}</code>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {item.timestamp.toLocaleString()} • {item.searchEngine}
-                          </p>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => loadFromHistory(item)}
-                          className="ml-2 shrink-0"
-                        >
-                          Charger
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          )}
+          {/* Enhanced Search History */}
+          <div className="flex justify-center mb-6">
+            <EnhancedSearchHistory
+              searchHistory={searchHistory}
+              onLoadFromHistory={loadFromHistory}
+              onClearHistory={clearHistory}
+              onExportHistory={exportHistory}
+              onUpdateHistory={setSearchHistory}
+            />
+          </div>
+
+          {/* Smart Search Suggestions */}
+          <div className="mb-8">
+            <SmartSearchSuggestions onApplyShortcut={applySearchShortcut} />
+          </div>
 
           <DockBottom searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
         </div>

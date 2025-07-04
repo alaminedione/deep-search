@@ -17,6 +17,8 @@ export type SearchBarProps = {
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
   searchText: string;
   searchEngine: string;
+  currentSearchData?: any;
+  onApplyAdvancedSearch?: (searchData: any) => void;
 };
 
 export interface propsSettingSearchEngine {
