@@ -93,14 +93,65 @@ Modèle: anthropic/claude-3-sonnet
 
 ### Opérateurs Google Dorks Supportés
 
+Deep Search supporte une liste complète et étendue d'opérateurs Google Dorks pour des recherches précises et avancées :
+
+#### Opérateurs de Base
 | Opérateur | Description | Exemple |
 |-----------|-------------|---------|
 | `site:` | Recherche sur un site spécifique | `site:github.com` |
-| `filetype:` | Recherche par type de fichier | `filetype:pdf` |
+| `filetype:` / `ext:` | Recherche par type de fichier | `filetype:pdf` |
 | `intitle:` | Mots dans le titre | `intitle:"machine learning"` |
 | `inurl:` | Mots dans l'URL | `inurl:blog` |
+| `intext:` | Texte dans le contenu | `intext:"configuration"` |
+| `define:` | Définition d'un terme | `define:blockchain` |
+
+#### Opérateurs Avancés
+| Opérateur | Description | Exemple |
+|-----------|-------------|---------|
+| `allintext:` | Tous les mots dans le contenu | `allintext:"python tutorial"` |
+| `allintitle:` | Tous les mots dans le titre | `allintitle:"data science"` |
+| `allinurl:` | Tous les mots dans l'URL | `allinurl:"admin config"` |
+| `inanchor:` | Texte dans les liens | `inanchor:"download"` |
+| `link:` | Pages avec liens vers URL | `link:example.com` |
+| `related:` | Sites similaires | `related:stackoverflow.com` |
+| `cache:` | Version en cache | `cache:example.com` |
+| `info:` | Informations sur URL | `info:github.com` |
+
+#### Opérateurs Temporels
+| Opérateur | Description | Exemple |
+|-----------|-------------|---------|
+| `before:` | Avant une date | `before:2023-01-01` |
+| `after:` | Après une date | `after:2022-01-01` |
+| `daterange:` | Plage de dates | `daterange:2451545-2451910` |
+
+#### Opérateurs Spécialisés
+| Opérateur | Description | Exemple |
+|-----------|-------------|---------|
+| `numrange:` | Plage numérique | `numrange:100-500` |
+| `location:` | Contenu géolocalisé | `location:"Paris"` |
+| `source:` | Source spécifique | `source:reuters` |
+| `weather:` | Météo | `weather:Paris` |
+| `stocks:` | Info boursière | `stocks:AAPL` |
+| `map:` | Cartes | `map:Eiffel Tower` |
+| `movie:` | Infos films | `movie:Inception` |
+
+#### Opérateurs de Sécurité (Audit Professionnel)
+| Opérateur | Description | Exemple |
+|-----------|-------------|---------|
+| `intext:"index of"` | Répertoires exposés | `intext:"index of" site:example.com` |
+| `inurl:admin` | Pages d'administration | `inurl:admin intitle:login` |
+| `filetype:conf` | Fichiers de configuration | `filetype:conf password` |
+| `filetype:sql` | Fichiers de base de données | `filetype:sql "insert into"` |
+| `filetype:env` | Variables d'environnement | `filetype:env API_KEY` |
+
+#### Opérateurs d'Exclusion
+| Opérateur | Description | Exemple |
+|-----------|-------------|---------|
 | `-site:` | Exclure un site | `-site:pinterest.com` |
 | `-"mot"` | Exclure un mot | `-"publicité"` |
+| `-filetype:` | Exclure un type de fichier | `-filetype:pdf` |
+
+> 📖 **Guide Complet**: Consultez le [Guide Complet des Opérateurs Google Dorks](./GOOGLE_DORKS_GUIDE.md) pour une documentation détaillée avec plus de 40 opérateurs et des exemples d'usage avancés.
 
 ### Exemples de Recherches
 

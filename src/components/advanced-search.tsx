@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { Filter, Star, Trash2, Download, Upload, Search, Code2 } from "lucide-react";
+import { Filter, Star, Trash2, Download, Upload, Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -168,29 +168,56 @@ const commonSuggestions = {
     "github.com", "stackoverflow.com", "medium.com", "dev.to", "reddit.com",
     "youtube.com", "wikipedia.org", "arxiv.org", "scholar.google.com",
     "researchgate.net", "ieee.org", "acm.org", "springer.com", "nature.com",
-    "docs.python.org", "developer.mozilla.org", "w3schools.com", "freecodecamp.org"
+    "docs.python.org", "developer.mozilla.org", "w3schools.com", "freecodecamp.org",
+    "coursera.org", "edx.org", "khan.academy.org", "mit.edu", "stanford.edu",
+    "pubmed.ncbi.nlm.nih.gov", "science.org", "bbc.com", "cnn.com", "reuters.com",
+    "lemonde.fr", "lefigaro.fr", "liberation.fr", "drive.google.com", "dropbox.com",
+    "mega.nz", "twitter.com", "facebook.com", "linkedin.com", "instagram.com",
+    "gitlab.com", "bitbucket.org", "sourceforge.net", "cve.mitre.org", "nvd.nist.gov"
   ],
   fileTypes: [
     "pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx",
     "txt", "md", "py", "js", "ts", "java", "cpp", "html", "css",
     "json", "xml", "csv", "sql", "zip", "rar", "mp4", "mp3", "png", "jpg",
-    "log", "conf", "config", "ini", "yaml", "toml"
+    "log", "conf", "config", "ini", "yaml", "toml", "env", "bak", "backup",
+    "old", "tmp", "db", "mdb", "sqlite", "tar", "gz", "7z", "iso",
+    "exe", "msi", "dmg", "deb", "rpm", "apk", "jar", "war", "ear"
   ],
   commonWords: [
     "tutorial", "guide", "documentation", "example", "sample",
     "template", "framework", "library", "tool", "resource",
     "course", "training", "workshop", "conference", "research",
-    "paper", "study", "analysis", "report", "handbook"
+    "paper", "study", "analysis", "report", "handbook",
+    "manual", "reference", "api", "sdk", "plugin", "extension",
+    "download", "free", "open source", "license", "installation",
+    "configuration", "setup", "troubleshooting", "error", "bug",
+    "security", "vulnerability", "exploit", "patch", "update"
   ],
   operators: [
     { name: "site:", description: "Recherche sur un site spécifique", example: "site:github.com" },
     { name: "filetype:", description: "Type de fichier", example: "filetype:pdf" },
+    { name: "ext:", description: "Extension de fichier", example: "ext:docx" },
     { name: "intext:", description: "Texte dans le contenu", example: 'intext:"python"' },
     { name: "intitle:", description: "Mot dans le titre", example: 'intitle:"guide"' },
     { name: "inurl:", description: "Mot dans l'URL", example: "inurl:admin" },
     { name: "before:", description: "Avant une date", example: "before:2023-01-01" },
     { name: "after:", description: "Après une date", example: "after:2022-01-01" },
-    { name: "allintext:", description: "Tous les mots dans le contenu", example: 'allintext:"machine learning"' }
+    { name: "allintext:", description: "Tous les mots dans le contenu", example: 'allintext:"machine learning"' },
+    { name: "allintitle:", description: "Tous les mots dans le titre", example: 'allintitle:"data science"' },
+    { name: "allinurl:", description: "Tous les mots dans l'URL", example: 'allinurl:"admin config"' },
+    { name: "inanchor:", description: "Texte dans les liens", example: 'inanchor:"download"' },
+    { name: "link:", description: "Pages avec liens vers URL", example: "link:example.com" },
+    { name: "related:", description: "Sites similaires", example: "related:stackoverflow.com" },
+    { name: "cache:", description: "Version en cache", example: "cache:example.com" },
+    { name: "info:", description: "Informations sur URL", example: "info:github.com" },
+    { name: "numrange:", description: "Plage numérique", example: "numrange:100-500" },
+    { name: "location:", description: "Contenu géolocalisé", example: 'location:"Paris"' },
+    { name: "source:", description: "Source spécifique", example: "source:reuters" },
+    { name: "define:", description: "Définition", example: "define:machine learning" },
+    { name: "stocks:", description: "Info boursière", example: "stocks:AAPL" },
+    { name: "weather:", description: "Météo", example: "weather:Paris" },
+    { name: "map:", description: "Carte", example: "map:Eiffel Tower" },
+    { name: "movie:", description: "Info film", example: "movie:Inception" }
   ]
 };
 

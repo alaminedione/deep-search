@@ -13,70 +13,165 @@ interface DorkOperator {
   syntax: string;
   description: string;
   example: string;
-  category: 'basic' | 'advanced' | 'file' | 'site' | 'content' | 'time';
+  category: 'basic' | 'advanced' | 'file' | 'content' | 'time';
   requiresValue: boolean;
 }
 
-// Liste complète des opérateurs Google Dorks basée sur la recherche
+// Liste complète des opérateurs Google Dorks basée sur les meilleures pratiques
 const GOOGLE_DORK_OPERATORS: DorkOperator[] = [
-  // Basic operators
-  { name: 'Site', syntax: 'site:', description: 'Recherche sur un site spécifique', example: 'site:github.com', category: 'site', requiresValue: true },
+  // Basic Search Operators
+  { name: 'Site', syntax: 'site:', description: 'Recherche sur un site spécifique', example: 'site:github.com', category: 'basic', requiresValue: true },
   { name: 'Filetype', syntax: 'filetype:', description: 'Recherche par type de fichier', example: 'filetype:pdf', category: 'file', requiresValue: true },
-  { name: 'Intext', syntax: 'intext:', description: 'Texte dans le contenu', example: 'intext:"mot-clé"', category: 'content', requiresValue: true },
-  { name: 'Intitle', syntax: 'intitle:', description: 'Mot dans le titre', example: 'intitle:"guide"', category: 'content', requiresValue: true },
-  { name: 'Inurl', syntax: 'inurl:', description: 'Mot dans l\'URL', example: 'inurl:admin', category: 'content', requiresValue: true },
+  { name: 'Ext', syntax: 'ext:', description: 'Extension de fichier (alias filetype)', example: 'ext:docx', category: 'file', requiresValue: true },
+  { name: 'Intext', syntax: 'intext:', description: 'Texte dans le contenu de la page', example: 'intext:"configuration"', category: 'content', requiresValue: true },
+  { name: 'Intitle', syntax: 'intitle:', description: 'Mot dans le titre de la page', example: 'intitle:"admin panel"', category: 'content', requiresValue: true },
+  { name: 'Inurl', syntax: 'inurl:', description: 'Mot dans l\'URL de la page', example: 'inurl:login', category: 'content', requiresValue: true },
   
-  // Advanced operators
-  { name: 'Allintext', syntax: 'allintext:', description: 'Tous les mots dans le contenu', example: 'allintext:"python tutorial"', category: 'advanced', requiresValue: true },
-  { name: 'Allintitle', syntax: 'allintitle:', description: 'Tous les mots dans le titre', example: 'allintitle:"machine learning"', category: 'advanced', requiresValue: true },
-  { name: 'Allinurl', syntax: 'allinurl:', description: 'Tous les mots dans l\'URL', example: 'allinurl:"admin login"', category: 'advanced', requiresValue: true },
-  { name: 'Link', syntax: 'link:', description: 'Pages avec liens vers URL', example: 'link:example.com', category: 'advanced', requiresValue: true },
-  { name: 'Related', syntax: 'related:', description: 'Sites similaires', example: 'related:github.com', category: 'advanced', requiresValue: true },
-  { name: 'Cache', syntax: 'cache:', description: 'Version en cache', example: 'cache:example.com', category: 'advanced', requiresValue: true },
+  // Advanced Content Operators
+  { name: 'Allintext', syntax: 'allintext:', description: 'Tous les mots dans le contenu', example: 'allintext:"python machine learning"', category: 'advanced', requiresValue: true },
+  { name: 'Allintitle', syntax: 'allintitle:', description: 'Tous les mots dans le titre', example: 'allintitle:"data science tutorial"', category: 'advanced', requiresValue: true },
+  { name: 'Allinurl', syntax: 'allinurl:', description: 'Tous les mots dans l\'URL', example: 'allinurl:"admin config"', category: 'advanced', requiresValue: true },
+  { name: 'Inanchor', syntax: 'inanchor:', description: 'Texte dans les liens pointant vers la page', example: 'inanchor:"download here"', category: 'advanced', requiresValue: true },
+  { name: 'Allinanchor', syntax: 'allinanchor:', description: 'Tous les mots dans les liens', example: 'allinanchor:"free download pdf"', category: 'advanced', requiresValue: true },
   
-  // Time-based operators
-  { name: 'Before', syntax: 'before:', description: 'Avant une date', example: 'before:2023-01-01', category: 'time', requiresValue: true },
-  { name: 'After', syntax: 'after:', description: 'Après une date', example: 'after:2022-01-01', category: 'time', requiresValue: true },
+  // Link and Relationship Operators
+  { name: 'Link', syntax: 'link:', description: 'Pages avec liens vers cette URL', example: 'link:example.com', category: 'advanced', requiresValue: true },
+  { name: 'Related', syntax: 'related:', description: 'Sites similaires ou liés', example: 'related:stackoverflow.com', category: 'advanced', requiresValue: true },
+  { name: 'Cache', syntax: 'cache:', description: 'Version en cache de Google', example: 'cache:example.com', category: 'advanced', requiresValue: true },
+  { name: 'Info', syntax: 'info:', description: 'Informations sur une URL', example: 'info:github.com', category: 'advanced', requiresValue: true },
   
-  // Numeric operators
-  { name: 'Numrange', syntax: 'numrange:', description: 'Plage numérique', example: 'numrange:100-200', category: 'advanced', requiresValue: true },
+  // Time-based Operators
+  { name: 'Before', syntax: 'before:', description: 'Contenu publié avant cette date', example: 'before:2023-01-01', category: 'time', requiresValue: true },
+  { name: 'After', syntax: 'after:', description: 'Contenu publié après cette date', example: 'after:2022-01-01', category: 'time', requiresValue: true },
+  { name: 'Daterange', syntax: 'daterange:', description: 'Plage de dates (format Julian)', example: 'daterange:2451545-2451910', category: 'time', requiresValue: true },
   
-  // Blog-specific operators
-  { name: 'Inanchor', syntax: 'inanchor:', description: 'Texte dans les liens', example: 'inanchor:"cliquez ici"', category: 'advanced', requiresValue: true },
-  { name: 'Allinanchor', syntax: 'allinanchor:', description: 'Tous les mots dans les liens', example: 'allinanchor:"télécharger pdf"', category: 'advanced', requiresValue: true },
+  // Numeric and Range Operators
+  { name: 'Numrange', syntax: 'numrange:', description: 'Plage de nombres', example: 'numrange:100-500', category: 'advanced', requiresValue: true },
+  { name: 'Price', syntax: '$', description: 'Recherche de prix', example: '$100..$500', category: 'advanced', requiresValue: true },
+  
+  // Geographic Operators
+  { name: 'Location', syntax: 'location:', description: 'Contenu géolocalisé', example: 'location:"Paris, France"', category: 'advanced', requiresValue: true },
+  { name: 'Near', syntax: 'NEAR:', description: 'Mots proches l\'un de l\'autre', example: 'python NEAR:5 tutorial', category: 'advanced', requiresValue: true },
+  
+  // Social Media Operators
+  { name: 'Source', syntax: 'source:', description: 'Source spécifique (Google News)', example: 'source:reuters', category: 'advanced', requiresValue: true },
+  { name: 'Blogurl', syntax: 'blogurl:', description: 'URL de blog spécifique', example: 'blogurl:medium.com', category: 'advanced', requiresValue: true },
+  
+  // File and Document Operators
+  { name: 'Insubject', syntax: 'insubject:', description: 'Dans le sujet (groupes)', example: 'insubject:"python help"', category: 'content', requiresValue: true },
+  { name: 'Group', syntax: 'group:', description: 'Groupe de discussion spécifique', example: 'group:comp.lang.python', category: 'advanced', requiresValue: true },
+  { name: 'Msgid', syntax: 'msgid:', description: 'ID de message spécifique', example: 'msgid:123456789', category: 'advanced', requiresValue: true },
+  
+  // Special Search Operators
+  { name: 'Define', syntax: 'define:', description: 'Définition d\'un terme', example: 'define:machine learning', category: 'basic', requiresValue: true },
+  { name: 'Stocks', syntax: 'stocks:', description: 'Informations boursières', example: 'stocks:AAPL', category: 'basic', requiresValue: true },
+  { name: 'Weather', syntax: 'weather:', description: 'Météo d\'un lieu', example: 'weather:Paris', category: 'basic', requiresValue: true },
+  { name: 'Map', syntax: 'map:', description: 'Carte d\'un lieu', example: 'map:Eiffel Tower', category: 'basic', requiresValue: true },
+  { name: 'Movie', syntax: 'movie:', description: 'Informations sur un film', example: 'movie:Inception', category: 'basic', requiresValue: true },
+  
+  // Security and Penetration Testing Operators
+  { name: 'Intext Index', syntax: 'intext:"index of"', description: 'Répertoires exposés', example: 'intext:"index of" "parent directory"', category: 'content', requiresValue: false },
+  { name: 'Inurl Admin', syntax: 'inurl:admin', description: 'Pages d\'administration', example: 'inurl:admin intitle:login', category: 'content', requiresValue: false },
+  { name: 'Filetype Config', syntax: 'filetype:conf', description: 'Fichiers de configuration', example: 'filetype:conf inurl:firewall', category: 'file', requiresValue: false },
+  { name: 'Intitle Login', syntax: 'intitle:login', description: 'Pages de connexion', example: 'intitle:login inurl:admin', category: 'content', requiresValue: false },
+  
+  // Database and Backup Operators
+  { name: 'Filetype SQL', syntax: 'filetype:sql', description: 'Fichiers de base de données', example: 'filetype:sql "insert into"', category: 'file', requiresValue: false },
+  { name: 'Filetype Bak', syntax: 'filetype:bak', description: 'Fichiers de sauvegarde', example: 'filetype:bak inurl:backup', category: 'file', requiresValue: false },
+  { name: 'Intext Password', syntax: 'intext:password', description: 'Contenu avec mots de passe', example: 'intext:password filetype:txt', category: 'content', requiresValue: false },
+  
+  // Development and Code Operators
+  { name: 'Filetype Env', syntax: 'filetype:env', description: 'Fichiers d\'environnement', example: 'filetype:env "API_KEY"', category: 'file', requiresValue: false },
+  { name: 'Intext API Key', syntax: 'intext:"api key"', description: 'Clés API exposées', example: 'intext:"api key" filetype:json', category: 'content', requiresValue: false },
+  { name: 'Inurl Git', syntax: 'inurl:.git', description: 'Dépôts Git exposés', example: 'inurl:.git intitle:"index of"', category: 'content', requiresValue: false },
+  
+  // Error and Debug Operators
+  { name: 'Intext Error', syntax: 'intext:error', description: 'Pages d\'erreur', example: 'intext:"fatal error" intext:"stack trace"', category: 'content', requiresValue: false },
+  { name: 'Intext Warning', syntax: 'intext:warning', description: 'Avertissements système', example: 'intext:warning intext:"deprecated"', category: 'content', requiresValue: false },
+  { name: 'Intitle Exception', syntax: 'intitle:exception', description: 'Pages d\'exception', example: 'intitle:exception intext:"stack trace"', category: 'content', requiresValue: false },
 ];
 
 // Templates de requêtes prédéfinies
 const QUERY_TEMPLATES = {
   academic: {
     name: 'Recherche académique',
-    template: 'site:scholar.google.com OR site:arxiv.org OR site:researchgate.net "{query}" filetype:pdf',
+    template: 'site:scholar.google.com OR site:arxiv.org OR site:researchgate.net OR site:ieee.org "{query}" filetype:pdf',
     description: 'Recherche d\'articles scientifiques et académiques'
   },
   code: {
     name: 'Code source',
-    template: 'site:github.com OR site:gitlab.com "{query}" filetype:py OR filetype:js OR filetype:ts',
+    template: 'site:github.com OR site:gitlab.com OR site:bitbucket.org "{query}" filetype:py OR filetype:js OR filetype:ts OR filetype:java',
     description: 'Recherche de code source et projets'
   },
   documentation: {
     name: 'Documentation',
-    template: 'intitle:"documentation" OR intitle:"guide" OR intitle:"manual" "{query}" filetype:pdf OR filetype:doc',
+    template: 'intitle:"documentation" OR intitle:"guide" OR intitle:"manual" OR intitle:"tutorial" "{query}" filetype:pdf OR filetype:doc',
     description: 'Guides et documentation technique'
   },
-  vulnerabilities: {
-    name: 'Fichiers sensibles',
-    template: 'intext:"index of /" "{query}" -inurl:jsp -inurl:php -inurl:html',
-    description: 'Recherche de répertoires exposés'
+  security: {
+    name: 'Audit sécurité',
+    template: 'intext:"index of /" OR inurl:admin OR intitle:login OR filetype:conf "{query}" -inurl:jsp -inurl:php',
+    description: 'Recherche de vulnérabilités et fichiers sensibles'
   },
   news: {
     name: 'Articles de presse',
-    template: 'site:bbc.com OR site:cnn.com OR site:reuters.com "{query}" after:2023-01-01',
-    description: 'Actualités récentes'
+    template: 'site:bbc.com OR site:cnn.com OR site:reuters.com OR site:lemonde.fr "{query}" after:2023-01-01',
+    description: 'Actualités récentes et articles journalistiques'
   },
   social: {
     name: 'Réseaux sociaux',
-    template: 'site:twitter.com OR site:facebook.com OR site:linkedin.com "{query}"',
-    description: 'Recherche sur les réseaux sociaux'
+    template: 'site:twitter.com OR site:facebook.com OR site:linkedin.com OR site:reddit.com "{query}"',
+    description: 'Recherche sur les plateformes sociales'
+  },
+  files: {
+    name: 'Fichiers partagés',
+    template: 'site:drive.google.com OR site:dropbox.com OR site:mega.nz "{query}" filetype:zip OR filetype:rar OR filetype:pdf',
+    description: 'Recherche de fichiers partagés publiquement'
+  },
+  databases: {
+    name: 'Bases de données',
+    template: 'filetype:sql OR filetype:db OR filetype:mdb "{query}" intext:"insert into" OR intext:"create table"',
+    description: 'Fichiers de bases de données exposés'
+  },
+  configs: {
+    name: 'Fichiers config',
+    template: 'filetype:conf OR filetype:config OR filetype:ini OR filetype:env "{query}" intext:"password" OR intext:"api_key"',
+    description: 'Fichiers de configuration et secrets'
+  },
+  backups: {
+    name: 'Sauvegardes',
+    template: 'filetype:bak OR filetype:backup OR filetype:old OR filetype:tmp "{query}" inurl:backup OR intext:"backup"',
+    description: 'Fichiers de sauvegarde exposés'
+  },
+  logs: {
+    name: 'Fichiers de logs',
+    template: 'filetype:log OR filetype:txt "{query}" intext:"error" OR intext:"exception" OR intext:"stack trace"',
+    description: 'Logs d\'erreurs et de débogage'
+  },
+  educational: {
+    name: 'Contenu éducatif',
+    template: 'site:coursera.org OR site:edx.org OR site:khan.academy.org OR site:mit.edu "{query}" intitle:"course" OR intitle:"tutorial"',
+    description: 'Cours et ressources éducatives'
+  },
+  research: {
+    name: 'Recherche scientifique',
+    template: 'site:pubmed.ncbi.nlm.nih.gov OR site:nature.com OR site:science.org "{query}" intitle:"research" OR intitle:"study"',
+    description: 'Publications et recherches scientifiques'
+  },
+  forums: {
+    name: 'Forums et discussions',
+    template: 'site:stackoverflow.com OR site:reddit.com OR site:quora.com "{query}" intext:"question" OR intext:"answer"',
+    description: 'Discussions et Q&A techniques'
+  },
+  vulnerabilities: {
+    name: 'CVE et vulnérabilités',
+    template: 'site:cve.mitre.org OR site:nvd.nist.gov "{query}" intext:"CVE-" OR intext:"vulnerability"',
+    description: 'Base de données de vulnérabilités'
+  },
+  patents: {
+    name: 'Brevets',
+    template: 'site:patents.google.com OR site:uspto.gov "{query}" intitle:"patent" OR filetype:pdf',
+    description: 'Recherche de brevets et propriété intellectuelle'
   }
 };
 

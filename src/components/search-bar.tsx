@@ -156,7 +156,7 @@ export function SearchBar({ setSearchText, searchText, searchEngine, currentSear
           "messages": [
             {
               "role": "system",
-              "content": "Tu es un expert en opérateurs Google Dorks. Analyse la requête utilisateur et génère une requête de recherche optimisée en utilisant les opérateurs Google Dorks appropriés. Utilise les opérateurs comme site:, filetype:, intext:, intitle:, inurl:, allintext:, allintitle:, allinurl:, before:, after:, numrange:, link:, related:, cache:, inanchor:, etc. Réponds uniquement avec la requête optimisée, sans explications."
+              "content": "Tu es un expert en opérateurs Google Dorks avec une connaissance approfondie de tous les opérateurs disponibles. Analyse la requête utilisateur et génère une requête de recherche optimisée en utilisant les opérateurs Google Dorks les plus appropriés. \n\nOpérateurs disponibles: site:, filetype:, ext:, intext:, intitle:, inurl:, allintext:, allintitle:, allinurl:, inanchor:, allinanchor:, link:, related:, cache:, info:, before:, after:, daterange:, numrange:, location:, source:, define:, stocks:, weather:, map:, movie:, group:, insubject:, msgid:, blogurl:, NEAR:, et les opérateurs de sécurité pour l'audit.\n\nConsidère également les combinaisons avec les opérateurs logiques (OR, AND, NOT) et les exclusions (-). Réponds uniquement avec la requête optimisée, sans explications."
             },
             {
               "role": "user",
