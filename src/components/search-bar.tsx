@@ -1,4 +1,4 @@
-import { Loader2, Sparkles, History, TrendingUp } from "lucide-react";
+import { Loader2, Sparkles, History, TrendingUp, Settings } from "lucide-react";
 import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
@@ -15,6 +15,7 @@ export function SearchBar({ setSearchText, searchText, searchEngine, currentSear
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
   // Load search history from localStorage
@@ -122,7 +123,10 @@ export function SearchBar({ setSearchText, searchText, searchEngine, currentSear
     "Recherchez avec l'IA ou les opérateurs Dorks...",
     "Essayez: 'tutoriels python filetype:pdf'",
     "Exemple: 'site:github.com machine learning'",
-    "Trouvez des documents: 'guide SEO filetype:pdf'",
+    "Recherche académique: 'site:scholar.google.com'",
+    "Documents: 'intitle:\"guide\" filetype:pdf'",
+    "Code source: 'site:github.com language:python'",
+    "Actualités: 'after:2023-01-01 before:2024-01-01'",
     "Recherche avancée avec Deep Search",
   ];
 
@@ -152,15 +156,15 @@ export function SearchBar({ setSearchText, searchText, searchEngine, currentSear
           "messages": [
             {
               "role": "system",
-              "content": "Tu es un expert en opérateurs Google Dorks. Génère une requête de recherche optimisée en utilisant les opérateurs appropriés. Réponds uniquement avec la requête, sans explications."
+              "content": "Tu es un expert en opérateurs Google Dorks. Analyse la requête utilisateur et génère une requête de recherche optimisée en utilisant les opérateurs Google Dorks appropriés. Utilise les opérateurs comme site:, filetype:, intext:, intitle:, inurl:, allintext:, allintitle:, allinurl:, before:, after:, numrange:, link:, related:, cache:, inanchor:, etc. Réponds uniquement avec la requête optimisée, sans explications."
             },
             {
               "role": "user",
-              "content": `Améliore cette recherche avec des opérateurs Google Dorks: ${query}`
+              "content": `Améliore cette recherche avec des opérateurs Google Dorks appropriés: ${query}`
             }
           ],
-          "max_tokens": 150,
-          "temperature": 0.3
+          "max_tokens": 200,
+          "temperature": 0.2
         }),
         signal: controller.signal
       });
@@ -183,8 +187,6 @@ export function SearchBar({ setSearchText, searchText, searchEngine, currentSear
       throw new Error('Erreur inconnue');
     }
   }, [apikey, endpoint, modele, toast]);
-
-
 
   const executeAISearch = useCallback(async () => {
     if (!searchText.trim()) {
@@ -300,71 +302,93 @@ export function SearchBar({ setSearchText, searchText, searchEngine, currentSear
   }, []);
 
   return (
-    <div className="flex justify-center gap-3 mb-6 w-full items-center max-w-4xl mx-auto px-4">
-      <div className="flex-1 max-w-2xl relative" ref={suggestionRef}>
-        <PlaceholdersAndVanishInput
-          placeholders={placeholders}
-          onChange={handleInputChange}
-          onSubmit={onSubmit}
-          onKeyDown={handleKeyDown}
-        />
-        
-        {/* Suggestions Dropdown */}
-        {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={suggestion}
-                className={`px-4 py-2 cursor-pointer transition-colors ${
-                  index === selectedSuggestionIndex 
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
-                    : 'hover:bg-gray-50 dark:hover:bg-zinc-700'
-                }`}
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                <div className="flex items-center gap-2">
-                  {searchHistory.includes(suggestion) ? (
-                    <History className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <TrendingUp className="h-4 w-4 text-gray-400" />
-                  )}
-                  <span className="text-sm">{suggestion}</span>
+    <div className="w-full max-w-4xl mx-auto px-4 space-y-4">
+      {/* Main Search Interface */}
+      <div className="flex justify-center gap-3 items-center">
+        <div className="flex-1 max-w-2xl relative" ref={suggestionRef}>
+          <PlaceholdersAndVanishInput
+            placeholders={placeholders}
+            onChange={handleInputChange}
+            onSubmit={onSubmit}
+            onKeyDown={handleKeyDown}
+          />
+          
+          {/* Suggestions Dropdown */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
+              {suggestions.map((suggestion, index) => (
+                <div
+                  key={suggestion}
+                  className={`px-4 py-2 cursor-pointer transition-colors ${
+                    index === selectedSuggestionIndex 
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
+                      : 'hover:bg-gray-50 dark:hover:bg-zinc-700'
+                  }`}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  <div className="flex items-center gap-2">
+                    {searchHistory.includes(suggestion) ? (
+                      <History className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <TrendingUp className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className="text-sm">{suggestion}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            size="lg"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            title="Options de recherche avancée"
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+
+          <Button 
+            className="min-w-[140px]" 
+            onClick={executeAISearch}
+            disabled={isSubmitting || !searchText.trim() || !configured}
+            title={!configured ? 'Configurez votre API d\'abord' : 'Générer une requête optimisée avec l\'IA'}
+            size="lg"
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Génération...
+              </>
+            ) : (
+              'Recherche IA'
+            )}
+          </Button>
+        </div>
       </div>
 
-      <AdvancedSearch 
-        onApplySearch={(searchData) => {
-          if (onApplyAdvancedSearch) {
-            onApplyAdvancedSearch(searchData);
-          }
-        }}
-        currentSearchData={currentSearchData || {
-          searchText,
-          tags: {}
-        }}
-      />
-
-      <Button 
-        className="shrink-0 min-w-[140px]" 
-        onClick={executeAISearch}
-        disabled={isSubmitting || !searchText.trim() || !configured}
-        title={!configured ? 'Configurez votre API d\'abord' : 'Générer une requête optimisée avec l\'IA'}
-        size="lg"
-      >
-        <Sparkles className="mr-2 h-4 w-4" />
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Génération...
-          </>
-        ) : (
-          'Recherche IA'
-        )}
-      </Button>
+      {/* Advanced Search Panel */}
+      {showAdvanced && (
+        <div className="border rounded-lg bg-gray-50 dark:bg-zinc-900 p-4">
+          <AdvancedSearch 
+            onApplySearch={(searchData) => {
+              if (onApplyAdvancedSearch) {
+                onApplyAdvancedSearch(searchData);
+              }
+              setShowAdvanced(false); // Close panel after applying
+            }}
+            currentSearchData={currentSearchData || {
+              searchText,
+              tags: {}
+            }}
+            isEmbedded={true}
+          />
+        </div>
+      )}
     </div>
   );
 }
