@@ -9,10 +9,13 @@ import { TSearchEngine } from "./types";
 import { tagsSites, tagsWords, tagsFileType, tagsWordsInTitle, tagsWordsInUrl, tagsSitesToExclude } from "./lib/tags-examples";
 import { SettingApiProvider } from "./contexts/settingApi";
 import { useToast } from "./hooks/use-toast";
-import { Copy, Share2, Trash2 } from "lucide-react";
+import { Copy, Share2, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 
 import { EnhancedSearchHistory } from "./components/enhanced-search-history";
 import { SmartSearchSuggestions } from "./components/smart-search-suggestions";
+import { HomeStats } from "./components/home-stats";
+import { QuickStartGuide } from "./components/quick-start-guide";
+import { FeatureShowcase } from "./components/feature-showcase";
 
 interface SearchHistory {
   id: string;
@@ -38,6 +41,8 @@ const App = () => {
   const [searchText, setSearchText] = useState("");
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [currentView, setCurrentView] = useState<'home' | 'search'>('home');
   
   const defaultSearchEngine: TSearchEngine = "google.com"
   const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
@@ -265,156 +270,263 @@ const App = () => {
       }
     }
 
+    // Switch to search view when applying shortcut
+    setCurrentView('search');
+
     toast({
       title: "Raccourci appliqué",
       description: `Le raccourci "${shortcut.title}" a été appliqué avec succès.`,
     });
   }, [setSearchText, setExampleTagsSites, setExampleTagsFileType, setExampleTagsWordsInTitle, setExampleTagsWordsInUrl, setExampleTagsSitesToExclude, toast]);
 
+  const applyQuickExample = useCallback((example: any) => {
+    if (example.searchText) {
+      setSearchText(example.searchText);
+    }
+
+    if (example.tags) {
+      if (example.tags.sites) {
+        const siteTags = example.tags.sites.map((site: string) => ({ 
+          id: Date.now().toString() + Math.random(), 
+          text: site 
+        }));
+        setExampleTagsSites(siteTags);
+      }
+
+      if (example.tags.fileTypes) {
+        const fileTypeTags = example.tags.fileTypes.map((type: string) => ({ 
+          id: Date.now().toString() + Math.random(), 
+          text: type 
+        }));
+        setExampleTagsFileType(fileTypeTags);
+      }
+
+      if (example.tags.wordsInTitle) {
+        const titleTags = example.tags.wordsInTitle.map((title: string) => ({ 
+          id: Date.now().toString() + Math.random(), 
+          text: title 
+        }));
+        setExampleTagsWordsInTitle(titleTags);
+      }
+
+      if (example.tags.wordsInUrl) {
+        const urlTags = example.tags.wordsInUrl.map((url: string) => ({ 
+          id: Date.now().toString() + Math.random(), 
+          text: url 
+        }));
+        setExampleTagsWordsInUrl(urlTags);
+      }
+    }
+
+    // Switch to search view when applying example
+    setCurrentView('search');
+
+    toast({
+      title: "Exemple appliqué",
+      description: "L'exemple de recherche a été configuré avec succès.",
+    });
+  }, [setSearchText, setExampleTagsSites, setExampleTagsFileType, setExampleTagsWordsInTitle, setExampleTagsWordsInUrl, toast]);
+
+  const startTour = useCallback(() => {
+    setCurrentView('search');
+    toast({
+      title: "Visite guidée",
+      description: "Explorez toutes les fonctionnalités de Deep Search !",
+    });
+  }, [toast]);
+
   return (
     <SettingApiProvider>
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
         <nav className="items-center justify-between">
-          <h1 className='text-4xl text-center mb-6 mt-8 font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent' 
-              style={{ fontFamily: "JetBrains Mono" }}>
-            Deep Search
-          </h1>
-          <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto px-4">
+          <div className="flex items-center justify-between max-w-6xl mx-auto px-4 pt-8">
+            <h1 className='text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent' 
+                style={{ fontFamily: "JetBrains Mono" }}>
+              Deep Search
+            </h1>
+            <div className="flex items-center gap-4">
+              <Button 
+                variant={currentView === 'home' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('home')}
+              >
+                Accueil
+              </Button>
+              <Button 
+                variant={currentView === 'search' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('search')}
+              >
+                Recherche
+              </Button>
+            </div>
+          </div>
+          <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto px-4 mt-4">
             Effectuez des recherches avancées avec les opérateurs Google Dorks et l'intelligence artificielle
           </p>
         </nav>
 
-        <header className="mb-8">
-          <SearchBar 
-            setSearchText={setSearchText} 
-            searchText={searchText} 
-            searchEngine={searchEngine}
-            currentSearchData={{
-              searchText,
-              tags: {
-                sites: TagsSites.map(tag => tag.text),
-                excludeSites: TagsSitesToExclude.map(tag => tag.text),
-                fileTypes: TagsFileType.map(tag => tag.text),
-                wordsInTitle: TagsWordsInTitle.map(tag => tag.text),
-                wordsInUrl: TagsWordsInUrl.map(tag => tag.text),
-                excludeWords: TagsWords.map(tag => tag.text)
-              }
-            }}
-            onApplyAdvancedSearch={(searchData) => {
-              setSearchText(searchData.searchText || "");
-              if (searchData.tags) {
-                setExampleTagsSites(searchData.tags.sites?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
-                setExampleTagsSitesToExclude(searchData.tags.excludeSites?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
-                setExampleTagsFileType(searchData.tags.fileTypes?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
-                setExampleTagsWordsInTitle(searchData.tags.wordsInTitle?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
-                setExampleTagsWordsInUrl(searchData.tags.wordsInUrl?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
-                setExampleTagsWords(searchData.tags.excludeWords?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
-              }
-            }}
-          />
-        </header>
+        {currentView === 'home' ? (
+          /* Home View */
+          <div className="max-w-6xl mx-auto px-4 space-y-12">
+            {/* Home Statistics */}
+            <HomeStats searchHistory={searchHistory} />
+            
+            {/* Quick Start Guide */}
+            <QuickStartGuide onApplyExample={applyQuickExample} />
+            
+            {/* Feature Showcase */}
+            <FeatureShowcase onStartTour={startTour} />
+          </div>
+        ) : (
+          /* Search View */
+          <div className="max-w-4xl mx-auto px-4 space-y-6">
+            <header className="mb-8">
+              <SearchBar 
+                setSearchText={setSearchText} 
+                searchText={searchText} 
+                searchEngine={searchEngine}
+                currentSearchData={{
+                  searchText,
+                  tags: {
+                    sites: TagsSites.map(tag => tag.text),
+                    excludeSites: TagsSitesToExclude.map(tag => tag.text),
+                    fileTypes: TagsFileType.map(tag => tag.text),
+                    wordsInTitle: TagsWordsInTitle.map(tag => tag.text),
+                    wordsInUrl: TagsWordsInUrl.map(tag => tag.text),
+                    excludeWords: TagsWords.map(tag => tag.text)
+                  }
+                }}
+                onApplyAdvancedSearch={(searchData) => {
+                  setSearchText(searchData.searchText || "");
+                  if (searchData.tags) {
+                    setExampleTagsSites(searchData.tags.sites?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                    setExampleTagsSitesToExclude(searchData.tags.excludeSites?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                    setExampleTagsFileType(searchData.tags.fileTypes?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                    setExampleTagsWordsInTitle(searchData.tags.wordsInTitle?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                    setExampleTagsWordsInUrl(searchData.tags.wordsInUrl?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                    setExampleTagsWords(searchData.tags.excludeWords?.map((text: string) => ({ id: Date.now().toString() + Math.random(), text })) || []);
+                  }
+                }}
+              />
+            </header>
 
-        <div className="max-w-4xl mx-auto px-4 space-y-6">
-          {/* Query Preview */}
-          {queryPreview && (
-            <div className="bg-muted/50 rounded-lg p-4 border">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-sm">Aperçu de la requête:</h3>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" onClick={copyQuery}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => navigator.share?.({ text: queryPreview })}>
-                    <Share2 className="h-4 w-4" />
-                  </Button>
+            {/* Query Preview */}
+            {queryPreview && (
+              <div className="bg-muted/50 rounded-lg p-4 border">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-sm">Aperçu de la requête:</h3>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" onClick={copyQuery}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => navigator.share?.({ text: queryPreview })}>
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
+                <code className="text-sm bg-background p-2 rounded block overflow-x-auto">
+                  {queryPreview}
+                </code>
               </div>
-              <code className="text-sm bg-background p-2 rounded block overflow-x-auto">
-                {queryPreview}
-              </code>
+            )}
+
+            {/* Advanced Options Toggle */}
+            <div className="flex justify-center">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                className="flex items-center gap-2"
+              >
+                Options avancées
+                {showAdvancedOptions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
             </div>
-          )}
 
-          <div className="grid gap-4">
-            <InputTags
-              id='websites'
-              placeholder='Sites à inclure (ex: example.com, .org)'
-              tags={TagsSites}
-              setTags={setExampleTagsSites}
-            />
+            {/* Advanced Search Options */}
+            {showAdvancedOptions && (
+              <div className="grid gap-4 space-y-2">
+                <InputTags
+                  id='websites'
+                  placeholder='Sites à inclure (ex: example.com, .org)'
+                  tags={TagsSites}
+                  setTags={setExampleTagsSites}
+                />
 
-            <InputTags
-              id='site-toExclude'
-              placeholder='Sites à exclure (ex: site1.com, site2.com)'
-              tags={TagsSitesToExclude}
-              setTags={setExampleTagsSitesToExclude}
-            />
+                <InputTags
+                  id='site-toExclude'
+                  placeholder='Sites à exclure (ex: site1.com, site2.com)'
+                  tags={TagsSitesToExclude}
+                  setTags={setExampleTagsSitesToExclude}
+                />
 
-            <InputTags
-              id='word-toExclude'
-              placeholder='Mots à exclure du texte (ex: publicité, spam)'
-              tags={TagsWords}
-              setTags={setExampleTagsWords}
-            />
+                <InputTags
+                  id='word-toExclude'
+                  placeholder='Mots à exclure du texte (ex: publicité, spam)'
+                  tags={TagsWords}
+                  setTags={setExampleTagsWords}
+                />
 
-            <InputTags
-              id='filetypes'
-              placeholder="Types de fichiers (ex: pdf, docx, mp4, png)"
-              tags={TagsFileType}
-              setTags={setExampleTagsFileType}
-            />
+                <InputTags
+                  id='filetypes'
+                  placeholder="Types de fichiers (ex: pdf, docx, mp4, png)"
+                  tags={TagsFileType}
+                  setTags={setExampleTagsFileType}
+                />
 
-            <InputTags
-              id="intitle"
-              placeholder="Mots dans le titre (ex: guide, tutoriel)"
-              tags={TagsWordsInTitle}
-              setTags={setExampleTagsWordsInTitle}
-            />
+                <InputTags
+                  id="intitle"
+                  placeholder="Mots dans le titre (ex: guide, tutoriel)"
+                  tags={TagsWordsInTitle}
+                  setTags={setExampleTagsWordsInTitle}
+                />
 
-            <InputTags
-              id="inurl"
-              placeholder="Mots dans l'URL (ex: blog, article)"
-              tags={TagsWordsInUrl}
-              setTags={setExampleTagsWordsInUrl}
-            />
+                <InputTags
+                  id="inurl"
+                  placeholder="Mots dans l'URL (ex: blog, article)"
+                  tags={TagsWordsInUrl}
+                  setTags={setExampleTagsWordsInUrl}
+                />
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className='flex flex-wrap items-center gap-3 justify-center'>
+              <Button 
+                className="min-w-[120px]" 
+                onClick={search}
+                disabled={isLoading || !queryPreview.trim()}
+                size="lg"
+              >
+                {isLoading ? "Recherche..." : "Rechercher"}
+              </Button>
+              <Button variant={'outline'} onClick={deleteAllTags}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Effacer tous les tags
+              </Button>
+              <Button variant={'outline'} onClick={copyQuery} disabled={!queryPreview.trim()}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copier la requête
+              </Button>
+            </div>
+
+            {/* Enhanced Search History */}
+            <div className="flex justify-center mb-6">
+              <EnhancedSearchHistory
+                searchHistory={searchHistory}
+                onLoadFromHistory={loadFromHistory}
+                onClearHistory={clearHistory}
+                onExportHistory={exportHistory}
+                onUpdateHistory={setSearchHistory}
+              />
+            </div>
+
+            {/* Smart Search Suggestions */}
+            <div className="mb-8">
+              <SmartSearchSuggestions onApplyShortcut={applySearchShortcut} />
+            </div>
           </div>
+        )}
 
-          {/* Action Buttons */}
-          <div className='flex flex-wrap items-center gap-3 justify-center'>
-            <Button 
-              className="min-w-[120px]" 
-              onClick={search}
-              disabled={isLoading || !queryPreview.trim()}
-              size="lg"
-            >
-              {isLoading ? "Recherche..." : "Rechercher"}
-            </Button>
-            <Button variant={'outline'} onClick={deleteAllTags}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Effacer tous les tags
-            </Button>
-            <Button variant={'outline'} onClick={copyQuery} disabled={!queryPreview.trim()}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copier la requête
-            </Button>
-          </div>
-
-          {/* Enhanced Search History */}
-          <div className="flex justify-center mb-6">
-            <EnhancedSearchHistory
-              searchHistory={searchHistory}
-              onLoadFromHistory={loadFromHistory}
-              onClearHistory={clearHistory}
-              onExportHistory={exportHistory}
-              onUpdateHistory={setSearchHistory}
-            />
-          </div>
-
-          {/* Smart Search Suggestions */}
-          <div className="mb-8">
-            <SmartSearchSuggestions onApplyShortcut={applySearchShortcut} />
-          </div>
-
+        <div className="max-w-4xl mx-auto px-4 mt-8">
           <DockBottom searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
         </div>
       </div>
