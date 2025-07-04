@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import InputTags from '@/components/input-tags'
 import { Tag } from "emblor";
 import { SearchBar } from './components/search-bar';
@@ -8,9 +8,21 @@ import { Button } from './components/ui/button';
 import { TSearchEngine } from "./types";
 import { tagsSites, tagsWords, tagsFileType, tagsWordsInTitle, tagsWordsInUrl, tagsSitesToExclude } from "./lib/tags-examples";
 import { SettingApiProvider } from "./contexts/settingApi";
+import { useToast } from "./hooks/use-toast";
+import { Copy, Download, Share2, History, Trash2 } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./components/ui/accordion";
+
+interface SearchHistory {
+  id: string;
+  query: string;
+  timestamp: Date;
+  searchEngine: TSearchEngine;
+}
 
 const App = () => {
+  const { toast } = useToast();
 
+  // State management with better organization
   const [TagsFileType, setExampleTagsFileType] = useState<Tag[]>(tagsFileType);
   const [TagsSitesToExclude, setExampleTagsSitesToExclude] = useState<Tag[]>(tagsSitesToExclude);
   const [TagsWords, setExampleTagsWords] = useState<Tag[]>(tagsWords);
@@ -18,34 +30,47 @@ const App = () => {
   const [TagsWordsInUrl, setExampleTagsWordsInUrl] = useState<Tag[]>(tagsWordsInUrl);
   const [TagsSites, setExampleTagsSites] = useState<Tag[]>(tagsSites);
   const [searchText, setSearchText] = useState("");
+  const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const defaultSearchEngine: TSearchEngine = "google.com"
   const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
 
+  // Load settings from localStorage on mount
   useEffect(() => {
-    const storedValue = localStorage.getItem("searchEngine");
-    if (storedValue) {
-      setSearchEngine(storedValue as TSearchEngine);
+    const storedSearchEngine = localStorage.getItem("searchEngine");
+    const storedHistory = localStorage.getItem("searchHistory");
+    
+    if (storedSearchEngine) {
+      setSearchEngine(storedSearchEngine as TSearchEngine);
+    }
+    
+    if (storedHistory) {
+      try {
+        const parsedHistory = JSON.parse(storedHistory).map((item: any) => ({
+          ...item,
+          timestamp: new Date(item.timestamp)
+        }));
+        setSearchHistory(parsedHistory);
+      } catch (error) {
+        console.error("Error parsing search history:", error);
+      }
     }
   }, []);
 
+  // Save search history to localStorage
+  useEffect(() => {
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+  }, [searchHistory]);
 
-
-  function deleteAllTags() {
-    setExampleTagsSites([])
-    setExampleTagsWordsInUrl([])
-    setExampleTagsWordsInTitle([])
-    setExampleTagsWords([])
-    setExampleTagsFileType([])
-    setExampleTagsSitesToExclude([])
-  }
-
-  function search() {
+  // Memoized query builder for better performance
+  const buildQuery = useCallback(() => {
     const sitesIncluded = TagsSites.length > 0
-      ? TagsSites.map(tag => `site:${tag.text}`).join(' OR ')
+      ? `(${TagsSites.map(tag => `site:${tag.text}`).join(' OR ')})`
       : '';
 
     const excludeSites = TagsSitesToExclude.length > 0
-      ? TagsSitesToExclude.map(tag => `-site:${tag.text}`).join(' OR ')
+      ? TagsSitesToExclude.map(tag => `-site:${tag.text}`).join(' ')
       : '';
 
     const wordsExcluded = TagsWords.length > 0
@@ -53,99 +78,298 @@ const App = () => {
       : '';
 
     const fileTypes = TagsFileType.length > 0
-      ? TagsFileType.map(tag => `filetype:${tag.text}`).join(' OR ')
+      ? `(${TagsFileType.map(tag => `filetype:${tag.text}`).join(' OR ')})`
       : '';
 
     const wordsInTitle = TagsWordsInTitle.length > 0
-      ? `${TagsWordsInTitle.map(tag => `intitle:"${tag.text}"`).join(' OR ')}`
+      ? `(${TagsWordsInTitle.map(tag => `intitle:"${tag.text}"`).join(' OR ')})`
       : '';
 
     const wordsInUrl = TagsWordsInUrl.length > 0
-      ? `${TagsWordsInUrl.map(tag => `inurl:"${tag.text}"`).join(' OR ')}`
+      ? `(${TagsWordsInUrl.map(tag => `inurl:"${tag.text}"`).join(' OR ')})`
       : '';
 
     const queryParts = [sitesIncluded, excludeSites, fileTypes, wordsExcluded, wordsInTitle, wordsInUrl]
-      .filter(part => part)  // On enlève les parties vides
+      .filter(part => part)
       .join(' ');
 
+    return `${searchText.trim()} ${queryParts}`.trim();
+  }, [TagsSites, TagsSitesToExclude, TagsWords, TagsFileType, TagsWordsInTitle, TagsWordsInUrl, searchText]);
 
-    const queryString = `${searchText.trim() === '' ? "" : searchText.trim()} ${queryParts}`;
-    const encodedQueryString = encodeURIComponent(queryString);
-    let searchUrl = '';
+  // Preview of the generated query
+  const queryPreview = useMemo(() => buildQuery(), [buildQuery]);
 
-    if (searchEngine === 'google.com') {
-      searchUrl = `https://www.google.com/search?q=${encodedQueryString}`;
-    } else if (searchEngine === 'duckduckgo.com') {
-      searchUrl = `https://duckduckgo.com/?q=${encodedQueryString}`;
-    } else {
-      alert("Moteur de recherche non pris en charge");
+  const deleteAllTags = useCallback(() => {
+    setExampleTagsSites([])
+    setExampleTagsWordsInUrl([])
+    setExampleTagsWordsInTitle([])
+    setExampleTagsWords([])
+    setExampleTagsFileType([])
+    setExampleTagsSitesToExclude([])
+    toast({
+      title: "Tags supprimés",
+      description: "Tous les tags ont été supprimés avec succès.",
+    });
+  }, [toast]);
+
+  const addToHistory = useCallback((query: string) => {
+    const newEntry: SearchHistory = {
+      id: Date.now().toString(),
+      query,
+      timestamp: new Date(),
+      searchEngine
+    };
+    
+    setSearchHistory(prev => [newEntry, ...prev.slice(0, 9)]); // Keep only 10 most recent
+  }, [searchEngine]);
+
+  const search = useCallback(() => {
+    const queryString = buildQuery();
+    
+    if (!queryString.trim()) {
+      toast({
+        title: "Recherche vide",
+        description: "Veuillez entrer au moins un terme de recherche.",
+        variant: "destructive"
+      });
       return;
     }
 
-    window.open(searchUrl, '_blank');
-  }
+    setIsLoading(true);
+    
+    try {
+      const encodedQueryString = encodeURIComponent(queryString);
+      let searchUrl = '';
+
+      if (searchEngine === 'google.com') {
+        searchUrl = `https://www.google.com/search?q=${encodedQueryString}`;
+      } else if (searchEngine === 'duckduckgo.com') {
+        searchUrl = `https://duckduckgo.com/?q=${encodedQueryString}`;
+      } else {
+        throw new Error("Moteur de recherche non pris en charge");
+      }
+
+      window.open(searchUrl, '_blank');
+      addToHistory(queryString);
+      
+      toast({
+        title: "Recherche lancée",
+        description: "Votre recherche a été ouverte dans un nouvel onglet.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error instanceof Error ? error.message : "Une erreur est survenue",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [buildQuery, searchEngine, addToHistory, toast]);
+
+  const copyQuery = useCallback(() => {
+    navigator.clipboard.writeText(queryPreview).then(() => {
+      toast({
+        title: "Copié",
+        description: "La requête a été copiée dans le presse-papiers.",
+      });
+    }).catch(() => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de copier la requête.",
+        variant: "destructive"
+      });
+    });
+  }, [queryPreview, toast]);
+
+  const exportHistory = useCallback(() => {
+    const dataStr = JSON.stringify(searchHistory, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'deep-search-history.json';
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Historique exporté",
+      description: "L'historique a été téléchargé avec succès.",
+    });
+  }, [searchHistory, toast]);
+
+  const clearHistory = useCallback(() => {
+    setSearchHistory([]);
+    toast({
+      title: "Historique effacé",
+      description: "L'historique des recherches a été supprimé.",
+    });
+  }, [toast]);
+
+  const loadFromHistory = useCallback((historyItem: SearchHistory) => {
+    // Parse the query to extract components (simplified implementation)
+    setSearchText(historyItem.query);
+    toast({
+      title: "Recherche chargée",
+      description: "La recherche de l'historique a été chargée.",
+    });
+  }, [toast]);
 
   return (
     <SettingApiProvider>
-      <>
-        <nav className=" items-center justify-between">
-          <h1 className='text-3xl text-center mb-3 mt-7' style={{ fontFamily: "JetBrains Mono" }}>Deep Search</h1>
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+        <nav className="items-center justify-between">
+          <h1 className='text-4xl text-center mb-6 mt-8 font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent' 
+              style={{ fontFamily: "JetBrains Mono" }}>
+            Deep Search
+          </h1>
+          <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto px-4">
+            Effectuez des recherches avancées avec les opérateurs Google Dorks et l'intelligence artificielle
+          </p>
         </nav>
 
-        <header className="">
-          <SearchBar setSearchText={setSearchText} searchText={searchText} searchEngine={searchEngine} />
+        <header className="mb-8">
+          <SearchBar 
+            setSearchText={setSearchText} 
+            searchText={searchText} 
+            searchEngine={searchEngine} 
+          />
         </header>
 
-        <div className="options flex flex-col gap-3">
+        <div className="max-w-4xl mx-auto px-4 space-y-6">
+          {/* Query Preview */}
+          {queryPreview && (
+            <div className="bg-muted/50 rounded-lg p-4 border">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-sm">Aperçu de la requête:</h3>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={copyQuery}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => navigator.share?.({ text: queryPreview })}>
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <code className="text-sm bg-background p-2 rounded block overflow-x-auto">
+                {queryPreview}
+              </code>
+            </div>
+          )}
 
-          <InputTags
-            id='websites'
-            placeholder='Enter websites (e.g. example.com, .org)'
-            tags={TagsSites}
-            setTags={setExampleTagsSites}
-          />
+          <div className="grid gap-4">
+            <InputTags
+              id='websites'
+              placeholder='Sites à inclure (ex: example.com, .org)'
+              tags={TagsSites}
+              setTags={setExampleTagsSites}
+            />
 
-          <InputTags
-            id='site-toExclude'
-            placeholder='Exclude sites (e.g. site1.com, site2.com)'
-            tags={TagsSitesToExclude}
-            setTags={setExampleTagsSitesToExclude}
-          />
+            <InputTags
+              id='site-toExclude'
+              placeholder='Sites à exclure (ex: site1.com, site2.com)'
+              tags={TagsSitesToExclude}
+              setTags={setExampleTagsSitesToExclude}
+            />
 
-          <InputTags
-            id='word-toExclude'
-            placeholder='Words to exclude in the text (e.g. -advertising, -spam)'
-            tags={TagsWords}
-            setTags={setExampleTagsWords}
-          />
+            <InputTags
+              id='word-toExclude'
+              placeholder='Mots à exclure du texte (ex: publicité, spam)'
+              tags={TagsWords}
+              setTags={setExampleTagsWords}
+            />
 
-          <InputTags
-            id='filetypes'
-            placeholder="Filetypes (e.g. pdf, docx, mp4, png)"
-            tags={TagsFileType}
-            setTags={setExampleTagsFileType}
-          />
+            <InputTags
+              id='filetypes'
+              placeholder="Types de fichiers (ex: pdf, docx, mp4, png)"
+              tags={TagsFileType}
+              setTags={setExampleTagsFileType}
+            />
 
-          <InputTags
-            id="intitle"
-            placeholder="Include words in title (e.g. guide, tutorial)"
-            tags={TagsWordsInTitle}
-            setTags={setExampleTagsWordsInTitle}
-          />
+            <InputTags
+              id="intitle"
+              placeholder="Mots dans le titre (ex: guide, tutoriel)"
+              tags={TagsWordsInTitle}
+              setTags={setExampleTagsWordsInTitle}
+            />
 
-          <InputTags
-            id="inurl"
-            placeholder="Include words in URL (e.g. blog, article)"
-            tags={TagsWordsInUrl}
-            setTags={setExampleTagsWordsInUrl}
-          />
-          <div className='flex items-center gap-2'>
-            <Button className="ml-1 w-min" onClick={search}>search</Button>
-            <Button variant={'outline'} onClick={deleteAllTags}>delete all tags</Button>
+            <InputTags
+              id="inurl"
+              placeholder="Mots dans l'URL (ex: blog, article)"
+              tags={TagsWordsInUrl}
+              setTags={setExampleTagsWordsInUrl}
+            />
           </div>
+
+          {/* Action Buttons */}
+          <div className='flex flex-wrap items-center gap-3 justify-center'>
+            <Button 
+              className="min-w-[120px]" 
+              onClick={search}
+              disabled={isLoading || !queryPreview.trim()}
+              size="lg"
+            >
+              {isLoading ? "Recherche..." : "Rechercher"}
+            </Button>
+            <Button variant={'outline'} onClick={deleteAllTags}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Effacer tous les tags
+            </Button>
+            <Button variant={'outline'} onClick={copyQuery} disabled={!queryPreview.trim()}>
+              <Copy className="h-4 w-4 mr-2" />
+              Copier la requête
+            </Button>
+          </div>
+
+          {/* Search History */}
+          {searchHistory.length > 0 && (
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="history">
+                <AccordionTrigger className="text-left">
+                  <div className="flex items-center gap-2">
+                    <History className="h-4 w-4" />
+                    Historique des recherches ({searchHistory.length})
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-end gap-2 mb-4">
+                      <Button variant="outline" size="sm" onClick={exportHistory}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Exporter
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={clearHistory}>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Effacer
+                      </Button>
+                    </div>
+                    {searchHistory.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="flex-1 min-w-0">
+                          <code className="text-sm block truncate">{item.query}</code>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {item.timestamp.toLocaleString()} • {item.searchEngine}
+                          </p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => loadFromHistory(item)}
+                          className="ml-2 shrink-0"
+                        >
+                          Charger
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          )}
+
           <DockBottom searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
         </div>
-      </>
+      </div>
     </SettingApiProvider>
   )
 }
