@@ -4,7 +4,7 @@ import { Button } from './components/ui/button';
 import { TSearchEngine } from "./types";
 import { SettingApiProvider } from "./contexts/settingApi";
 import { useToast } from "./hooks/use-toast";
-import { DockBottom } from '@/components/dock';
+import { SettingsPage } from '@/components/settings-page';
 import { UnifiedSearch } from './components/unified-search';
 import { EnhancedSearchHistory } from "./components/enhanced-search-history";
 import { SmartSearchSuggestions } from "./components/smart-search-suggestions";
@@ -169,6 +169,7 @@ const App = () => {
                 >
                   Recherche
                 </Button>
+                <SettingsPage searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
               </div>
             </div>
           </div>
@@ -210,9 +211,6 @@ const App = () => {
             </div>
           )}
         </main>
-
-        {/* Dock de navigation */}
-        <DockBottom searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
       </div>
     </SettingApiProvider>
   );
