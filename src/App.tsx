@@ -5,9 +5,7 @@ import { TSearchEngine } from "./types";
 import { SettingApiProvider } from "./contexts/settingApi";
 import { useToast } from "./hooks/use-toast";
 import { SettingsPage } from '@/components/settings-page';
-import { UnifiedSearch } from './components/unified-search';
-import { EnhancedSearchHistory } from "./components/enhanced-search-history";
-import { SmartSearchSuggestions } from "./components/smart-search-suggestions";
+import { EnhancedSearchInterface } from './components/enhanced-search-interface';
 import { HomeStats } from "./components/home-stats";
 import { HeroSection } from "./components/hero-section";
 
@@ -191,23 +189,17 @@ const App = () => {
           ) : (
             /* Search View */
             <div className="space-y-8 py-8">
-              {/* Interface de recherche unifiée */}
-              <UnifiedSearch 
+              {/* Interface de recherche unifiée avec onglets améliorés */}
+              <EnhancedSearchInterface
                 onSearch={executeSearch}
                 onAddToHistory={addToHistory}
+                searchHistory={searchHistory}
+                onLoadFromHistory={loadFromHistory}
+                onExportHistory={exportHistory}
+                onClearHistory={clearHistory}
+                onUpdateHistory={setSearchHistory}
+                onApplyShortcut={applySearchShortcut}
               />
-
-              {/* Suggestions intelligentes et historique */}
-              <div className="grid lg:grid-cols-2 gap-6">
-                <SmartSearchSuggestions onApplyShortcut={applySearchShortcut} />
-                <EnhancedSearchHistory 
-                  searchHistory={searchHistory}
-                  onLoadFromHistory={loadFromHistory}
-                  onExportHistory={exportHistory}
-                  onClearHistory={clearHistory}
-                  onUpdateHistory={setSearchHistory}
-                />
-              </div>
             </div>
           )}
         </main>
