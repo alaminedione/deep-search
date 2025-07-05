@@ -175,6 +175,38 @@
   .grid-auto-fill {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
+
+  /* Search interface improvements */
+  .search-interface-responsive {
+    @apply space-y-4 lg:space-y-6;
+  }
+
+  .search-tabs-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-3;
+  }
+
+  .search-button-responsive {
+    @apply w-full sm:w-auto min-w-[120px] h-12;
+  }
+
+  /* Enhanced focus states */
+  .enhanced-focus {
+    @apply focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-200;
+  }
+
+  /* Better hover effects */
+  .hover-lift {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105 active:scale-95;
+  }
+
+  /* Loading states */
+  .loading-pulse {
+    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700;
+  }
 }
 
 /* Keyframes for animations */
@@ -217,6 +249,14 @@
   
   .mobile-text-center {
     @apply text-center;
+  }
+
+  .mobile-spacing {
+    @apply space-y-3;
+  }
+  
+  .mobile-text-sm {
+    @apply text-sm;
   }
 }
 

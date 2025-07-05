@@ -1,9 +1,10 @@
 import { useState, useCallback } from "react";
-import { Search, Sparkles, Settings, Code2, Brain, History, Star } from "lucide-react";
+import { Search, Sparkles, Settings, Code2, Brain, History, Star, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import { UnifiedSearch } from "./unified-search";
 import { AdvancedSearch } from "./advanced-search";
 import { GoogleDorkBuilder } from "./google-dork-builder";
@@ -45,6 +46,7 @@ export function EnhancedSearchInterface({
   onApplyShortcut
 }: EnhancedSearchInterfaceProps) {
   const [activeTab, setActiveTab] = useState("simple");
+  const [showAdvancedTools, setShowAdvancedTools] = useState(false);
   const [currentSearchData, setCurrentSearchData] = useState<SearchData>({
     searchText: "",
     tags: {
@@ -61,115 +63,169 @@ export function EnhancedSearchInterface({
     setCurrentSearchData(searchData);
   }, []);
 
-  const tabsConfig = [
+  // Configuration simplifiée des onglets principaux
+  const mainTabsConfig = [
     {
       value: "simple",
-      label: "Recherche Simple",
+      label: "Recherche",
       icon: Search,
-      description: "Recherche rapide avec suggestions intelligentes",
-      color: "blue"
+      description: "Recherche simple avec IA",
+      primary: true
     },
     {
       value: "advanced",
-      label: "Recherche Avancée",
+      label: "Avancé",
       icon: Settings,
-      description: "Filtres avancés et presets personnalisés",
-      color: "purple"
-    },
+      description: "Filtres et options",
+      primary: true
+    }
+  ];
+
+  // Outils avancés regroupés
+  const advancedToolsConfig = [
     {
       value: "ai",
       label: "Assistant IA",
       icon: Brain,
-      description: "Optimisation automatique avec IA",
-      color: "green"
+      description: "Génération automatique de requêtes"
     },
     {
       value: "builder",
-      label: "Constructeur Dorks",
+      label: "Constructeur",
       icon: Code2,
-      description: "Construction manuelle de requêtes Google Dorks",
-      color: "orange"
+      description: "Construction manuelle de Dorks"
     },
     {
       value: "history",
       label: "Historique",
       icon: History,
-      description: "Gérer et réutiliser vos recherches",
-      color: "gray"
+      description: "Gérer vos recherches"
     },
     {
       value: "suggestions",
       label: "Suggestions",
       icon: Star,
-      description: "Raccourcis et suggestions intelligentes",
-      color: "yellow"
+      description: "Raccourcis intelligents"
     }
   ];
 
-  const getTabIcon = (IconComponent: any, color: string) => (
-    <IconComponent className={`h-4 w-4 mr-2 text-${color}-500`} />
-  );
-
   return (
     <motion.div 
-      className="w-full max-w-6xl mx-auto"
+      className="w-full max-w-6xl mx-auto space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
     >
-      <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Interface de Recherche Avancée
-              </CardTitle>
-              <CardDescription className="mt-2">
-                Explorez toutes les possibilités de recherche avec nos outils spécialisés
-              </CardDescription>
-            </div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Badge variant="outline" className="px-3 py-1">
-                <Sparkles className="h-3 w-3 mr-1" />
-                Powered by AI
-              </Badge>
-            </motion.div>
-          </div>
-        </CardHeader>
+      {/* En-tête simplifié */}
+      <div className="text-center space-y-3">
+        <motion.h2 
+          className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          Interface de Recherche Avancée
+        </motion.h2>
+        <motion.p 
+          className="text-muted-foreground max-w-2xl mx-auto text-lg"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          Explorez toutes les possibilités de recherche avec nos outils spécialisés
+        </motion.p>
+      </div>
 
-        <CardContent className="pt-0">
+      {/* Interface principale */}
+      <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-sm">
+        <CardContent className="p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* Navigation des onglets avec design amélioré */}
-            <div className="relative mb-8">
-              <TabsList className="grid w-full grid-cols-6 h-auto p-1 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl">
-                {tabsConfig.map((tab, index) => (
-                  <motion.div
+            {/* Navigation principale simplifiée */}
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+              <TabsList className="grid grid-cols-2 w-full lg:w-auto h-auto p-1 bg-gray-100/80 dark:bg-gray-800/80 rounded-xl">
+                {mainTabsConfig.map((tab) => (
+                  <TabsTrigger 
                     key={tab.value}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                    value={tab.value}
+                    className="flex items-center justify-center p-4 h-auto data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-lg rounded-lg transition-all duration-200"
                   >
-                    <TabsTrigger 
-                      value={tab.value}
-                      className="flex flex-col items-center justify-center p-3 h-auto data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-md rounded-lg transition-all duration-200 hover:scale-105"
-                    >
-                      <div className="flex items-center mb-1">
-                        {getTabIcon(tab.icon, tab.color)}
-                        <span className="font-medium text-sm">{tab.label}</span>
+                    <div className="flex items-center gap-3">
+                      <tab.icon className="h-5 w-5" />
+                      <div className="text-left">
+                        <div className="font-semibold">{tab.label}</div>
+                        <div className="text-xs text-muted-foreground hidden sm:block">
+                          {tab.description}
+                        </div>
                       </div>
-                      <span className="text-xs text-muted-foreground text-center leading-tight">
-                        {tab.description}
-                      </span>
-                    </TabsTrigger>
-                  </motion.div>
+                    </div>
+                  </TabsTrigger>
                 ))}
               </TabsList>
+
+              {/* Bouton pour les outils avancés */}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  variant={showAdvancedTools ? "default" : "outline"}
+                  onClick={() => setShowAdvancedTools(!showAdvancedTools)}
+                  className="w-full lg:w-auto gap-2 h-12"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Outils Avancés
+                  <motion.div
+                    animate={{ rotate: showAdvancedTools ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </motion.div>
+                </Button>
+              </motion.div>
             </div>
 
-            {/* Contenu des onglets avec animations */}
+            {/* Outils avancés (collapsible) */}
+            <AnimatePresence>
+              {showAdvancedTools && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, y: -20 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -20 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="mb-8"
+                >
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl">
+                    {advancedToolsConfig.map((tool, index) => (
+                      <motion.button
+                        key={tool.value}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        onClick={() => {
+                          setActiveTab(tool.value);
+                          setShowAdvancedTools(false);
+                        }}
+                        className={`p-4 rounded-lg border transition-all duration-200 text-left hover:shadow-md hover:scale-105 ${
+                          activeTab === tool.value
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <tool.icon className="h-5 w-5" />
+                          <span className="font-medium text-sm">{tool.label}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {tool.description}
+                        </p>
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Contenu des onglets */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -177,99 +233,100 @@ export function EnhancedSearchInterface({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
+                className="min-h-[400px]"
               >
-                {/* Onglet Recherche Simple */}
+                {/* Recherche Simple */}
                 <TabsContent value="simple" className="mt-0">
-                  <Card className="border-l-4 border-l-blue-500">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center text-lg">
-                        <Search className="h-5 w-5 mr-2 text-blue-500" />
-                        Recherche Simple et Rapide
-                      </CardTitle>
-                      <CardDescription>
+                  <div className="space-y-6">
+                    <div className="text-center space-y-2">
+                      <div className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
+                        <Search className="h-5 w-5" />
+                        <h3 className="text-xl font-semibold">Recherche Simple et Rapide</h3>
+                      </div>
+                      <p className="text-muted-foreground">
                         Interface simplifiée avec suggestions intelligentes et recherche IA
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-6">
                       <UnifiedSearch 
                         onSearch={onSearch}
                         onAddToHistory={onAddToHistory}
                       />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </TabsContent>
 
-                {/* Onglet Recherche Avancée */}
+                {/* Recherche Avancée */}
                 <TabsContent value="advanced" className="mt-0">
-                  <Card className="border-l-4 border-l-purple-500">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center text-lg">
-                        <Settings className="h-5 w-5 mr-2 text-purple-500" />
-                        Recherche Avancée avec Filtres
-                      </CardTitle>
-                      <CardDescription>
+                  <div className="space-y-6">
+                    <div className="text-center space-y-2">
+                      <div className="flex items-center justify-center gap-2 text-purple-600 dark:text-purple-400">
+                        <Settings className="h-5 w-5" />
+                        <h3 className="text-xl font-semibold">Recherche Avancée avec Filtres</h3>
+                      </div>
+                      <p className="text-muted-foreground">
                         Filtres détaillés, presets personnalisés et options avancées
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-xl p-6">
                       <AdvancedSearch
                         onApplySearch={handleApplyAdvancedSearch}
                         currentSearchData={currentSearchData}
                         isEmbedded={true}
                       />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </TabsContent>
 
-                {/* Onglet Assistant IA */}
+                {/* Assistant IA */}
                 <TabsContent value="ai" className="mt-0">
-                  <Card className="border-l-4 border-l-green-500">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center text-lg">
-                        <Brain className="h-5 w-5 mr-2 text-green-500" />
-                        Assistant IA pour Google Dorks
-                      </CardTitle>
-                      <CardDescription>
+                  <div className="space-y-6">
+                    <div className="text-center space-y-2">
+                      <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                        <Brain className="h-5 w-5" />
+                        <h3 className="text-xl font-semibold">Assistant IA pour Google Dorks</h3>
+                      </div>
+                      <p className="text-muted-foreground">
                         Génération automatique de requêtes optimisées par intelligence artificielle
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-xl p-6">
                       <GoogleDorkAI onQueryGenerated={onSearch} />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </TabsContent>
 
-                {/* Onglet Constructeur */}
+                {/* Constructeur */}
                 <TabsContent value="builder" className="mt-0">
-                  <Card className="border-l-4 border-l-orange-500">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center text-lg">
-                        <Code2 className="h-5 w-5 mr-2 text-orange-500" />
-                        Constructeur Google Dorks
-                      </CardTitle>
-                      <CardDescription>
+                  <div className="space-y-6">
+                    <div className="text-center space-y-2">
+                      <div className="flex items-center justify-center gap-2 text-orange-600 dark:text-orange-400">
+                        <Code2 className="h-5 w-5" />
+                        <h3 className="text-xl font-semibold">Constructeur Google Dorks</h3>
+                      </div>
+                      <p className="text-muted-foreground">
                         Construction manuelle et précise de requêtes Google Dorks avancées
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-xl p-6">
                       <GoogleDorkBuilder onQueryGenerated={onSearch} />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </TabsContent>
 
-                {/* Onglet Historique */}
+                {/* Historique */}
                 <TabsContent value="history" className="mt-0">
-                  <Card className="border-l-4 border-l-gray-500">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center text-lg">
-                        <History className="h-5 w-5 mr-2 text-gray-500" />
-                        Historique des Recherches
-                      </CardTitle>
-                      <CardDescription>
+                  <div className="space-y-6">
+                    <div className="text-center space-y-2">
+                      <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400">
+                        <History className="h-5 w-5" />
+                        <h3 className="text-xl font-semibold">Historique des Recherches</h3>
+                      </div>
+                      <p className="text-muted-foreground">
                         Gérez, organisez et réutilisez vos recherches précédentes
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-950/20 dark:to-slate-950/20 rounded-xl p-6">
                       <EnhancedSearchHistory
                         searchHistory={searchHistory}
                         onLoadFromHistory={onLoadFromHistory}
@@ -277,40 +334,46 @@ export function EnhancedSearchInterface({
                         onClearHistory={onClearHistory}
                         onUpdateHistory={onUpdateHistory}
                       />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </TabsContent>
 
-                {/* Onglet Suggestions */}
+                {/* Suggestions */}
                 <TabsContent value="suggestions" className="mt-0">
-                  <Card className="border-l-4 border-l-yellow-500">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center text-lg">
-                        <Star className="h-5 w-5 mr-2 text-yellow-500" />
-                        Suggestions Intelligentes
-                      </CardTitle>
-                      <CardDescription>
+                  <div className="space-y-6">
+                    <div className="text-center space-y-2">
+                      <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-400">
+                        <Star className="h-5 w-5" />
+                        <h3 className="text-xl font-semibold">Suggestions Intelligentes</h3>
+                      </div>
+                      <p className="text-muted-foreground">
                         Raccourcis de recherche et suggestions basées sur vos habitudes
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                      </p>
+                    </div>
+                    <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 rounded-xl p-6">
                       <SmartSearchSuggestions onApplyShortcut={onApplyShortcut} />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </TabsContent>
               </motion.div>
             </AnimatePresence>
           </Tabs>
 
-          {/* Indicateur de tab actif */}
+          {/* Indicateur de statut */}
           <motion.div 
-            className="mt-6 text-center"
+            className="mt-8 flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            <Badge variant="secondary" className="px-4 py-2">
-              {tabsConfig.find(tab => tab.value === activeTab)?.label} - {tabsConfig.find(tab => tab.value === activeTab)?.description}
+            <Badge variant="outline" className="px-4 py-2 text-sm">
+              <Sparkles className="h-3 w-3 mr-2" />
+              {activeTab === "simple" ? "Mode Simple" : 
+               activeTab === "advanced" ? "Mode Avancé" :
+               activeTab === "ai" ? "Assistant IA" :
+               activeTab === "builder" ? "Constructeur" :
+               activeTab === "history" ? "Historique" :
+               "Suggestions"}
             </Badge>
           </motion.div>
         </CardContent>
