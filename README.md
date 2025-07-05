@@ -16,18 +16,6 @@ Une application web moderne et épurée pour effectuer des recherches avancées 
 - **Support multi-modèles** (OpenAI, Anthropic, etc.)
 - **Optimisation intelligente** des recherches
 
-### 📊 Statistiques Simplifiées
-- **Recherches totales** - Nombre total de recherches effectuées
-- **Aujourd'hui** - Recherches du jour en cours
-- **Favoris** - Recherches marquées comme favorites
-- **Moyenne/jour** - Moyenne des recherches sur 7 jours
-
-### 🎨 Interface Moderne
-- **Design épuré** et minimaliste
-- **Responsive** sur tous les appareils
-- **Mode sombre/clair** automatique
-- **Animations fluides** avec Framer Motion
-- **Effets glassmorphism** pour un look moderne
 
 ## 🚀 Installation
 
@@ -56,15 +44,6 @@ npm run dev
 - **Google** (Gemini)
 - **Autres** modèles compatibles OpenAI
 
-## 📱 Responsive Design
-
-L'interface s'adapte parfaitement à tous les écrans :
-
-- **Mobile** (320px+) - Interface optimisée tactile
-- **Tablette** (768px+) - Layout adaptatif
-- **Desktop** (1024px+) - Expérience complète
-- **Large** (1440px+) - Utilisation optimale de l'espace
-
 ## 🛠️ Scripts Disponibles
 
 ```bash
@@ -86,46 +65,6 @@ npm run lint     # Vérification du code
 - **Radix UI** - Composants accessibles
 - **Framer Motion** - Animations fluides
 
-### Fonctionnalités
-- **LocalStorage** - Persistance des données
-- **PWA Ready** - Application web progressive
-- **Accessibility** - Conforme aux standards WCAG
-
-## 🎯 Améliorations Récentes
-
-### Interface Épurée
-- ✅ Suppression de la visite guidée
-- ✅ Simplification des statistiques (4 métriques essentielles)
-- ✅ Design moderne avec glassmorphism
-- ✅ Navigation sticky responsive
-
-### Performance
-- ✅ Optimisation du bundle size
-- ✅ Lazy loading des composants
-- ✅ Animations optimisées
-- ✅ Polices web optimisées
-
-### Accessibilité
-- ✅ Support clavier complet
-- ✅ Contraste amélioré
-- ✅ Textes alternatifs
-- ✅ Support lecteurs d'écran
-
-## 📦 Structure du Projet
-
-```
-src/
-├── components/          # Composants React
-│   ├── ui/             # Composants UI de base
-│   ├── home-stats.tsx  # Statistiques simplifiées
-│   ├── hero-section.tsx # Section d'accueil épurée
-│   └── ...
-├── contexts/           # Contextes React
-├── hooks/              # Hooks personnalisés
-├── lib/                # Utilitaires
-└── types.tsx           # Types TypeScript
-```
-
 ## 🤝 Contribution
 
 Les contributions sont les bienvenues ! Voici comment contribuer :
@@ -144,7 +83,6 @@ Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus
 
 **Alamine Dione**
 - GitHub: [@alaminedione](https://github.com/alaminedione)
-- Website: [alaminedione.dev](https://alaminedione.dev)
 
 ---
 
