@@ -113,8 +113,11 @@ export function UnifiedSearch({ onSearch, onAddToHistory }: UnifiedSearchProps) 
   const buildQuery = useCallback(() => {
     const { searchText, tags } = searchData;
     
+    // Construire la requête de recherche avec syntaxe corrigée
     const sitesIncluded = tags.sites.length > 0
-      ? `(${tags.sites.map(tag => `site:${tag.text}`).join(' OR ')})`
+      ? tags.sites.length === 1 
+        ? `site:${tags.sites[0].text}`
+        : `(${tags.sites.map(tag => `site:${tag.text}`).join(' OR ')})`
       : '';
 
     const excludeSites = tags.excludeSites.length > 0
@@ -126,15 +129,21 @@ export function UnifiedSearch({ onSearch, onAddToHistory }: UnifiedSearchProps) 
       : '';
 
     const fileTypes = tags.fileTypes.length > 0
-      ? `(${tags.fileTypes.map(tag => `filetype:${tag.text}`).join(' OR ')})`
+      ? tags.fileTypes.length === 1
+        ? `filetype:${tags.fileTypes[0].text}`
+        : `(${tags.fileTypes.map(tag => `filetype:${tag.text}`).join(' OR ')})`
       : '';
 
     const wordsInTitle = tags.wordsInTitle.length > 0
-      ? `(${tags.wordsInTitle.map(tag => `intitle:"${tag.text}"`).join(' OR ')})`
+      ? tags.wordsInTitle.length === 1
+        ? `intitle:"${tags.wordsInTitle[0].text}"`
+        : `(${tags.wordsInTitle.map(tag => `intitle:"${tag.text}"`).join(' OR ')})`
       : '';
 
     const wordsInUrl = tags.wordsInUrl.length > 0
-      ? `(${tags.wordsInUrl.map(tag => `inurl:"${tag.text}"`).join(' OR ')})`
+      ? tags.wordsInUrl.length === 1
+        ? `inurl:"${tags.wordsInUrl[0].text}"`
+        : `(${tags.wordsInUrl.map(tag => `inurl:"${tag.text}"`).join(' OR ')})`
       : '';
 
     const queryParts = [sitesIncluded, excludeSites, fileTypes, wordsExcluded, wordsInTitle, wordsInUrl]

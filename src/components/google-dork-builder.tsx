@@ -13,7 +13,7 @@ interface DorkOperator {
   syntax: string;
   description: string;
   example: string;
-  category: 'basic' | 'advanced' | 'file' | 'content' | 'time';
+  category: 'basic' | 'advanced' | 'file' | 'content' | 'time' | 'academic' | 'development' | 'social' | 'news' | 'education';
   requiresValue: boolean;
 }
 
@@ -89,6 +89,31 @@ const GOOGLE_DORK_OPERATORS: DorkOperator[] = [
   { name: 'Intext Error', syntax: 'intext:error', description: 'Pages d\'erreur', example: 'intext:"fatal error" intext:"stack trace"', category: 'content', requiresValue: false },
   { name: 'Intext Warning', syntax: 'intext:warning', description: 'Avertissements système', example: 'intext:warning intext:"deprecated"', category: 'content', requiresValue: false },
   { name: 'Intitle Exception', syntax: 'intitle:exception', description: 'Pages d\'exception', example: 'intitle:exception intext:"stack trace"', category: 'content', requiresValue: false },
+  
+  // Advanced Academic and Research Operators
+  { name: 'Scholar', syntax: 'site:scholar.google.com', description: 'Recherche académique Google Scholar', example: 'site:scholar.google.com "machine learning"', category: 'academic', requiresValue: false },
+  { name: 'ArXiv', syntax: 'site:arxiv.org', description: 'Prépublications scientifiques', example: 'site:arxiv.org "neural networks"', category: 'academic', requiresValue: false },
+  { name: 'PubMed', syntax: 'site:pubmed.ncbi.nlm.nih.gov', description: 'Littérature biomédicale', example: 'site:pubmed.ncbi.nlm.nih.gov "covid-19"', category: 'academic', requiresValue: false },
+  { name: 'IEEE', syntax: 'site:ieee.org', description: 'Publications IEEE', example: 'site:ieee.org "artificial intelligence"', category: 'academic', requiresValue: false },
+  
+  // Advanced Development Operators
+  { name: 'GitHub Code', syntax: 'site:github.com', description: 'Code source GitHub', example: 'site:github.com "function" filetype:py', category: 'development', requiresValue: false },
+  { name: 'Stack Overflow', syntax: 'site:stackoverflow.com', description: 'Questions et réponses', example: 'site:stackoverflow.com "python error"', category: 'development', requiresValue: false },
+  { name: 'Documentation', syntax: 'inurl:docs', description: 'Pages de documentation', example: 'inurl:docs "API reference"', category: 'development', requiresValue: false },
+  
+  // Social Media and Communication Operators
+  { name: 'Twitter', syntax: 'site:twitter.com', description: 'Tweets et discussions', example: 'site:twitter.com "breaking news"', category: 'social', requiresValue: false },
+  { name: 'Reddit', syntax: 'site:reddit.com', description: 'Discussions Reddit', example: 'site:reddit.com "AMA" intitle:"I am"', category: 'social', requiresValue: false },
+  { name: 'LinkedIn', syntax: 'site:linkedin.com', description: 'Profils et posts LinkedIn', example: 'site:linkedin.com "data scientist"', category: 'social', requiresValue: false },
+  
+  // News and Media Operators
+  { name: 'News Sites', syntax: 'site:bbc.com OR site:cnn.com OR site:reuters.com', description: 'Sites d\'actualités majeurs', example: '(site:bbc.com OR site:cnn.com) "breaking news"', category: 'news', requiresValue: false },
+  { name: 'French News', syntax: 'site:lemonde.fr OR site:lefigaro.fr', description: 'Presse française', example: '(site:lemonde.fr OR site:lefigaro.fr) "politique"', category: 'news', requiresValue: false },
+  
+  // E-learning and Education Operators
+  { name: 'Coursera', syntax: 'site:coursera.org', description: 'Cours en ligne Coursera', example: 'site:coursera.org "machine learning"', category: 'education', requiresValue: false },
+  { name: 'Khan Academy', syntax: 'site:khanacademy.org', description: 'Ressources Khan Academy', example: 'site:khanacademy.org "mathematics"', category: 'education', requiresValue: false },
+  { name: 'MIT OpenCourseWare', syntax: 'site:ocw.mit.edu', description: 'Cours MIT gratuits', example: 'site:ocw.mit.edu "computer science"', category: 'education', requiresValue: false },
 ];
 
 // Templates de requêtes prédéfinies
@@ -188,32 +213,57 @@ export function GoogleDorkBuilder({ onQueryGenerated, initialQuery = "" }: Googl
   const [includeTerms, setIncludeTerms] = useState<string[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
 
-  // Génération de la requête finale
+  // Génération de la requête finale avec syntaxe corrigée
   const generatedQuery = useMemo(() => {
     let query = baseQuery.trim();
     
-    // Ajouter les termes obligatoires
+    // Ajouter les termes obligatoires (sans parenthèses pour un seul terme)
     if (includeTerms.length > 0) {
-      const terms = includeTerms.map(term => `+"${term}"`).join(' ');
-      query = `${query} ${terms}`.trim();
+      if (includeTerms.length === 1) {
+        query = `${query} +"${includeTerms[0]}"`.trim();
+      } else {
+        const terms = includeTerms.map(term => `+"${term}"`).join(' ');
+        query = `${query} ${terms}`.trim();
+      }
     }
     
-    // Ajouter les opérateurs
+    // Grouper les opérateurs par type pour une syntaxe optimisée
+    const operatorGroups: Record<string, string[]> = {};
     selectedOperators.forEach(({ operator, value }) => {
       if (value.trim()) {
-        if (operator.syntax === 'site:' && !value.includes('.')) {
-          // Auto-compléter les sites communs
-          query += ` ${operator.syntax}${value}.com`;
-        } else {
-          query += ` ${operator.syntax}${value}`;
+        let processedValue = value.trim();
+        
+        // Auto-compléter les sites communs
+        if (operator.syntax === 'site:' && !processedValue.includes('.')) {
+          processedValue = `${processedValue}.com`;
         }
+        
+        if (!operatorGroups[operator.syntax]) {
+          operatorGroups[operator.syntax] = [];
+        }
+        operatorGroups[operator.syntax].push(processedValue);
       }
     });
     
-    // Exclure les termes
+    // Construire la requête avec la syntaxe correcte
+    Object.entries(operatorGroups).forEach(([syntax, values]) => {
+      if (values.length === 1) {
+        // Un seul paramètre : pas de parenthèses
+        query += ` ${syntax}${values[0]}`;
+      } else {
+        // Plusieurs paramètres : utiliser des parenthèses avec OR
+        query += ` (${values.map(value => `${syntax}${value}`).join(' OR ')})`;
+      }
+    });
+    
+    // Exclure les termes (sans parenthèses pour un seul terme)
     if (excludeTerms.length > 0) {
-      const terms = excludeTerms.map(term => `-"${term}"`).join(' ');
-      query = `${query} ${terms}`.trim();
+      if (excludeTerms.length === 1) {
+        query = `${query} -"${excludeTerms[0]}"`.trim();
+      } else {
+        const terms = excludeTerms.map(term => `-"${term}"`).join(' ');
+        query = `${query} ${terms}`.trim();
+      }
     }
     
     return query;
@@ -470,18 +520,36 @@ export function GoogleDorkBuilder({ onQueryGenerated, initialQuery = "" }: Googl
         </Button>
       </div>
 
-      {/* Conseils */}
+      {/* Conseils améliorés */}
       <div className="bg-muted p-3 rounded-lg">
         <div className="flex items-start gap-2">
           <Lightbulb className="h-4 w-4 mt-0.5 text-yellow-500" />
-          <div className="text-sm space-y-1">
-            <p className="font-medium">Conseils pour de meilleures recherches :</p>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>• Utilisez des guillemets pour les phrases exactes</li>
-              <li>• Combinez plusieurs opérateurs avec AND/OR</li>
-              <li>• Utilisez - pour exclure des termes</li>
-              <li>• Les opérateurs before:/after: acceptent le format YYYY-MM-DD</li>
-            </ul>
+          <div className="text-sm space-y-2">
+            <p className="font-medium">Conseils pour des recherches optimales :</p>
+            <div className="grid md:grid-cols-2 gap-3 text-xs text-muted-foreground">
+              <div>
+                <p className="font-medium text-foreground mb-1">Syntaxe de base :</p>
+                <ul className="space-y-1">
+                  <li>• Un seul paramètre : <code>filetype:pdf</code></li>
+                  <li>• Plusieurs paramètres : <code>(filetype:pdf OR filetype:doc)</code></li>
+                  <li>• Phrases exactes : <code>"machine learning"</code></li>
+                  <li>• Exclusion : <code>-"publicité"</code></li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-medium text-foreground mb-1">Opérateurs avancés :</p>
+                <ul className="space-y-1">
+                  <li>• Dates : <code>after:2023-01-01</code></li>
+                  <li>• Proximité : <code>python NEAR:5 tutorial</code></li>
+                  <li>• Prix : <code>$100..$500</code></li>
+                  <li>• Plages : <code>numrange:100-500</code></li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-2 p-2 bg-background rounded border">
+              <p className="font-medium text-xs text-foreground">Exemple de requête complexe :</p>
+              <code className="text-xs">"machine learning" (site:github.com OR site:arxiv.org) filetype:pdf after:2023-01-01 -"advertisement"</code>
+            </div>
           </div>
         </div>
       </div>

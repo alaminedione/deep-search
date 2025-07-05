@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useToast } from "../hooks/use-toast";
 import { GoogleDorkBuilder } from "./google-dork-builder";
+import { GoogleDorkAI } from "./google-dork-ai";
 
 interface SearchPreset {
   id: string;
@@ -400,9 +401,10 @@ export function AdvancedSearch({ onApplySearch, currentSearchData, isEmbedded = 
     return (
       <div className="w-full">
         <Tabs defaultValue="presets" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="presets">Presets</TabsTrigger>
-            <TabsTrigger value="builder">Constructeur Dorks</TabsTrigger>
+            <TabsTrigger value="builder">Constructeur</TabsTrigger>
+            <TabsTrigger value="ai">Assistant IA</TabsTrigger>
           </TabsList>
           
           <TabsContent value="presets" className="space-y-4 mt-4">
@@ -510,6 +512,37 @@ export function AdvancedSearch({ onApplySearch, currentSearchData, isEmbedded = 
               }}
             />
           </TabsContent>
+          
+          <TabsContent value="ai" className="space-y-6">
+            <GoogleDorkAI
+              onQueryGenerated={(query) => {
+                onApplySearch({
+                  searchText: query,
+                  tags: {
+                    sites: [],
+                    excludeSites: [],
+                    fileTypes: [],
+                    wordsInTitle: [],
+                    wordsInUrl: [],
+                    excludeWords: []
+                  }
+                });
+                setIsOpen(false);
+              }}
+              initialQuery={currentSearchData?.searchText || ""}
+            />
+          </TabsContent>
+          
+          <TabsContent value="ai" className="mt-4">
+            <GoogleDorkAI 
+              onQueryGenerated={(query) => {
+                onApplySearch({
+                  searchText: query,
+                  tags: {}
+                });
+              }}
+            />
+          </TabsContent>
         </Tabs>
       </div>
     );
@@ -532,9 +565,10 @@ export function AdvancedSearch({ onApplySearch, currentSearchData, isEmbedded = 
         </DialogHeader>
 
         <Tabs defaultValue="presets" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="presets">Presets</TabsTrigger>
-            <TabsTrigger value="builder">Constructeur Dorks</TabsTrigger>
+            <TabsTrigger value="builder">Constructeur</TabsTrigger>
+            <TabsTrigger value="ai">Assistant IA</TabsTrigger>
           </TabsList>
           
           <TabsContent value="presets" className="space-y-6">
