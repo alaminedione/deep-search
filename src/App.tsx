@@ -9,8 +9,6 @@ import { UnifiedSearch } from './components/unified-search';
 import { EnhancedSearchHistory } from "./components/enhanced-search-history";
 import { SmartSearchSuggestions } from "./components/smart-search-suggestions";
 import { HomeStats } from "./components/home-stats";
-import { QuickStartGuide } from "./components/quick-start-guide";
-import { FeatureShowcase } from "./components/feature-showcase";
 import { HeroSection } from "./components/hero-section";
 
 interface SearchHistory {
@@ -131,7 +129,6 @@ const App = () => {
   }, [toast]);
 
   const loadFromHistory = useCallback((_historyItem: SearchHistory) => {
-    // Parse the query to extract components (simplified implementation)
     toast({
       title: "Recherche chargée",
       description: "La recherche de l'historique a été chargée.",
@@ -139,99 +136,80 @@ const App = () => {
   }, [toast]);
 
   const applySearchShortcut = useCallback((_shortcut: any) => {
-    // Switch to search view when applying shortcut
     setCurrentView('search');
-
     toast({
       title: "Raccourci appliqué",
       description: "Le raccourci a été appliqué avec succès.",
     });
   }, [toast]);
 
-  const applyQuickExample = useCallback((_example: any) => {
-    // Switch to search view when applying example
-    setCurrentView('search');
-
-    toast({
-      title: "Exemple appliqué",
-      description: "L'exemple de recherche a été configuré avec succès.",
-    });
-  }, [toast]);
-
-  const startTour = useCallback(() => {
-    setCurrentView('search');
-    toast({
-      title: "Visite guidée",
-      description: "Explorez toutes les fonctionnalités de Deep Search !",
-    });
-  }, [toast]);
-
   return (
     <SettingApiProvider>
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-        <nav className="items-center justify-between">
-          <div className="flex items-center justify-between max-w-6xl mx-auto px-4 pt-8">
-            <h1 className='text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent' 
-                style={{ fontFamily: "JetBrains Mono" }}>
-              Deep Search
-            </h1>
-            <div className="flex items-center gap-4">
-              <Button 
-                variant={currentView === 'home' ? 'default' : 'outline'}
-                onClick={() => setCurrentView('home')}
-              >
-                Accueil
-              </Button>
-              <Button 
-                variant={currentView === 'search' ? 'default' : 'outline'}
-                onClick={() => setCurrentView('search')}
-              >
-                Recherche
-              </Button>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950/30">
+        {/* Navigation Header */}
+        <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-b border-gray-200/50 dark:border-gray-800/50">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <h1 className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent' 
+                  style={{ fontFamily: "JetBrains Mono" }}>
+                Deep Search
+              </h1>
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant={currentView === 'home' ? 'default' : 'ghost'}
+                  onClick={() => setCurrentView('home')}
+                  className="font-medium"
+                >
+                  Accueil
+                </Button>
+                <Button 
+                  variant={currentView === 'search' ? 'default' : 'ghost'}
+                  onClick={() => setCurrentView('search')}
+                  className="font-medium"
+                >
+                  Recherche
+                </Button>
+              </div>
             </div>
           </div>
-          <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto px-4 mt-4">
-            Effectuez des recherches avancées avec les opérateurs Google Dorks et l'intelligence artificielle
-          </p>
         </nav>
 
-        {currentView === 'home' ? (
-          /* Home View */
-          <div className="max-w-6xl mx-auto px-4 space-y-12">
-            {/* Hero Section */}
-            <HeroSection onStartSearch={() => setCurrentView('search')} />
-            
-            {/* Home Statistics */}
-            <HomeStats searchHistory={searchHistory} />
-            
-            {/* Quick Start Guide */}
-            <QuickStartGuide onApplyExample={applyQuickExample} />
-            
-            {/* Feature Showcase */}
-            <FeatureShowcase onStartTour={startTour} />
-          </div>
-        ) : (
-          /* Search View */
-          <div className="max-w-6xl mx-auto px-4 space-y-8">
-            {/* Interface de recherche unifiée */}
-            <UnifiedSearch 
-              onSearch={executeSearch}
-              onAddToHistory={addToHistory}
-            />
-
-            {/* Suggestions intelligentes */}
-            <div className="grid lg:grid-cols-2 gap-6">
-              <SmartSearchSuggestions onApplyShortcut={applySearchShortcut} />
-              <EnhancedSearchHistory 
-                searchHistory={searchHistory}
-                onLoadFromHistory={loadFromHistory}
-                onExportHistory={exportHistory}
-                onClearHistory={clearHistory}
-                onUpdateHistory={setSearchHistory}
-              />
+        {/* Main Content */}
+        <main className="max-w-6xl mx-auto px-4">
+          {currentView === 'home' ? (
+            /* Home View */
+            <div className="space-y-16 py-8">
+              {/* Hero Section */}
+              <HeroSection onStartSearch={() => setCurrentView('search')} />
+              
+              {/* Home Statistics */}
+              <div className="flex justify-center">
+                <HomeStats searchHistory={searchHistory} />
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            /* Search View */
+            <div className="space-y-8 py-8">
+              {/* Interface de recherche unifiée */}
+              <UnifiedSearch 
+                onSearch={executeSearch}
+                onAddToHistory={addToHistory}
+              />
+
+              {/* Suggestions intelligentes et historique */}
+              <div className="grid lg:grid-cols-2 gap-6">
+                <SmartSearchSuggestions onApplyShortcut={applySearchShortcut} />
+                <EnhancedSearchHistory 
+                  searchHistory={searchHistory}
+                  onLoadFromHistory={loadFromHistory}
+                  onExportHistory={exportHistory}
+                  onClearHistory={clearHistory}
+                  onUpdateHistory={setSearchHistory}
+                />
+              </div>
+            </div>
+          )}
+        </main>
 
         {/* Dock de navigation */}
         <DockBottom searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
