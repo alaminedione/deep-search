@@ -2,6 +2,8 @@
 
 Une application web moderne pour effectuer des recherches avancées en utilisant les opérateurs Google Dorks avec intégration IA.
 
+deep-search-ai.vercel.app
+
 ## Installation
 
 ```bash
