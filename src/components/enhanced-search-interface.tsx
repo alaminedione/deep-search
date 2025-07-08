@@ -84,12 +84,6 @@ export function EnhancedSearchInterface({
   // Outils avancés regroupés
   const advancedToolsConfig = [
     {
-      value: "ai",
-      label: "Assistant IA",
-      icon: Brain,
-      description: "Génération automatique de requêtes"
-    },
-    {
       value: "builder",
       label: "Constructeur",
       icon: Code2,
@@ -194,7 +188,7 @@ export function EnhancedSearchInterface({
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="mb-8"
                 >
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl">
                     {advancedToolsConfig.map((tool, index) => (
                       <motion.button
                         key={tool.value}
@@ -237,21 +231,71 @@ export function EnhancedSearchInterface({
               >
                 {/* Recherche Simple */}
                 <TabsContent value="simple" className="mt-0">
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     <div className="text-center space-y-2">
                       <div className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
                         <Search className="h-5 w-5" />
                         <h3 className="text-xl font-semibold">Recherche Simple et Rapide</h3>
                       </div>
                       <p className="text-muted-foreground">
-                        Interface simplifiée avec suggestions intelligentes et recherche IA
+                        Interface simplifiée avec suggestions intelligentes et assistant IA intégré
                       </p>
                     </div>
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-6">
-                      <UnifiedSearch 
-                        onSearch={onSearch}
-                        onAddToHistory={onAddToHistory}
-                      />
+
+                    {/* Assistant IA intégré */}
+                    <div className="space-y-4">
+                      <div className="text-center space-y-3">
+                        <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                          <Brain className="h-5 w-5" />
+                          <h4 className="text-lg font-semibold">🤖 Assistant IA - Traducteur Google Dork</h4>
+                        </div>
+                        <div className="max-w-4xl mx-auto">
+                          <p className="text-muted-foreground mb-3">
+                            <strong>Vous ne connaissez pas les opérateurs Google Dork ?</strong> Pas de problème ! 
+                            Posez simplement votre question en français et l'IA la traduira automatiquement.
+                          </p>
+                          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-muted-foreground bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+                            <span className="flex items-center gap-1">
+                              <span className="text-green-500">✅</span>
+                              <strong>Vous dites:</strong> "Je veux des PDF gratuits"
+                            </span>
+                            <span className="hidden sm:block">→</span>
+                            <span className="flex items-center gap-1">
+                              <span className="text-blue-500">🤖</span>
+                              <strong>IA génère:</strong> <code className="bg-white dark:bg-gray-700 px-2 py-1 rounded text-xs">filetype:pdf free</code>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-xl p-6">
+                        <GoogleDorkAI onQueryGenerated={onSearch} />
+                      </div>
+                    </div>
+
+                    {/* Séparateur */}
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-200 dark:border-gray-700" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white dark:bg-gray-900 px-2 text-muted-foreground">ou</span>
+                      </div>
+                    </div>
+
+                    {/* Recherche classique */}
+                    <div className="space-y-4">
+                      <div className="text-center space-y-2">
+                        <h4 className="text-lg font-semibold text-blue-600 dark:text-blue-400">Recherche Classique</h4>
+                        <p className="text-muted-foreground">
+                          Recherche traditionnelle avec suggestions intelligentes
+                        </p>
+                      </div>
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-6">
+                        <UnifiedSearch 
+                          onSearch={onSearch}
+                          onAddToHistory={onAddToHistory}
+                        />
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
@@ -274,24 +318,6 @@ export function EnhancedSearchInterface({
                         currentSearchData={currentSearchData}
                         isEmbedded={true}
                       />
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Assistant IA */}
-                <TabsContent value="ai" className="mt-0">
-                  <div className="space-y-6">
-                    <div className="text-center space-y-2">
-                      <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
-                        <Brain className="h-5 w-5" />
-                        <h3 className="text-xl font-semibold">Assistant IA pour Google Dorks</h3>
-                      </div>
-                      <p className="text-muted-foreground">
-                        Génération automatique de requêtes optimisées par intelligence artificielle
-                      </p>
-                    </div>
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-xl p-6">
-                      <GoogleDorkAI onQueryGenerated={onSearch} />
                     </div>
                   </div>
                 </TabsContent>
@@ -368,9 +394,8 @@ export function EnhancedSearchInterface({
           >
             <Badge variant="outline" className="px-4 py-2 text-sm">
               <Sparkles className="h-3 w-3 mr-2" />
-              {activeTab === "simple" ? "Mode Simple" : 
+              {activeTab === "simple" ? "Mode Simple avec Assistant IA" : 
                activeTab === "advanced" ? "Mode Avancé" :
-               activeTab === "ai" ? "Assistant IA" :
                activeTab === "builder" ? "Constructeur" :
                activeTab === "history" ? "Historique" :
                "Suggestions"}

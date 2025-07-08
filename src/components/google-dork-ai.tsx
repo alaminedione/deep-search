@@ -184,38 +184,89 @@ export function GoogleDorkAI({ onQueryGenerated, initialQuery = "" }: GoogleDork
   };
 
   return (
-    <div className="space-y-6 p-4 border rounded-lg bg-card">
-      <div className="flex items-center gap-2">
-        <Brain className="h-5 w-5 text-purple-500" />
-        <h3 className="text-lg font-semibold">Assistant IA Google Dorks</h3>
+    <div className="space-y-6 p-6 border rounded-xl bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
+      {/* En-tête explicatif */}
+      <div className="text-center space-y-3">
+        <div className="flex items-center justify-center gap-3">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+            <Brain className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          </div>
+          <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Assistant IA - Traducteur Google Dork
+          </h3>
+        </div>
+        <div className="max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-2">
+            <strong>Vous ne connaissez pas les opérateurs Google Dork ?</strong>
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Posez simplement votre question en français et l'IA la transformera automatiquement en requête de recherche avancée avec les bons opérateurs !
+          </p>
+        </div>
+        
+        {/* Exemples visuels */}
+        <div className="grid md:grid-cols-2 gap-4 mt-6">
+          <div className="bg-white/80 dark:bg-gray-800/80 p-4 rounded-lg border">
+            <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">✅ Vous dites :</div>
+            <p className="text-sm italic">"Je cherche des documents PDF sur l'intelligence artificielle publiés après 2020"</p>
+          </div>
+          <div className="bg-white/80 dark:bg-gray-800/80 p-4 rounded-lg border">
+            <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">🤖 L'IA génère :</div>
+            <p className="text-xs font-mono bg-gray-100 dark:bg-gray-700 p-2 rounded">
+              "intelligence artificielle" filetype:pdf after:2020-01-01
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Interface d'entrée */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="ai-input">Décrivez ce que vous recherchez</Label>
-          <div className="flex gap-2">
-            <Input
-              id="ai-input"
-              placeholder="Ex: recherche académique sur l'intelligence artificielle, code Python pour machine learning..."
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              className="flex-1"
-            />
+          <Label htmlFor="ai-input" className="text-base font-medium">
+            💬 Posez votre question en français
+          </Label>
+          <p className="text-sm text-muted-foreground mb-3">
+            Décrivez ce que vous cherchez comme si vous parliez à un ami. L'IA se charge du reste !
+          </p>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <Input
+                id="ai-input"
+                placeholder="Ex: Je veux des cours gratuits de Python pour débutants..."
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                className="h-12 text-base"
+              />
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Badge variant="outline" className="text-xs cursor-pointer hover:bg-gray-100" 
+                       onClick={() => setUserInput("Je cherche des documents PDF sur l'intelligence artificielle")}>
+                  💡 Exemple 1
+                </Badge>
+                <Badge variant="outline" className="text-xs cursor-pointer hover:bg-gray-100"
+                       onClick={() => setUserInput("Je veux du code Python pour faire du machine learning")}>
+                  💡 Exemple 2
+                </Badge>
+                <Badge variant="outline" className="text-xs cursor-pointer hover:bg-gray-100"
+                       onClick={() => setUserInput("Je cherche des vulnérabilités de sécurité récentes")}>
+                  💡 Exemple 3
+                </Badge>
+              </div>
+            </div>
             <Button 
               onClick={generateSmartSuggestions}
               disabled={!userInput.trim() || isAnalyzing}
-              className="min-w-[120px]"
+              className="h-12 px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+              size="lg"
             >
               {isAnalyzing ? (
                 <>
-                  <Brain className="mr-2 h-4 w-4 animate-pulse" />
-                  Analyse...
+                  <Brain className="mr-2 h-5 w-5 animate-pulse" />
+                  Traduction...
                 </>
               ) : (
                 <>
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  Analyser
+                  <Wand2 className="mr-2 h-5 w-5" />
+                  Traduire
                 </>
               )}
             </Button>
@@ -224,46 +275,63 @@ export function GoogleDorkAI({ onQueryGenerated, initialQuery = "" }: GoogleDork
 
         {/* Suggestions intelligentes */}
         {suggestions.length > 0 && (
-          <div className="space-y-3">
-            <h4 className="font-medium text-sm flex items-center gap-2">
-              <Lightbulb className="h-4 w-4 text-yellow-500" />
-              Suggestions intelligentes
-            </h4>
-            <div className="grid gap-3">
+          <div className="space-y-4">
+            <div className="text-center">
+              <h4 className="text-lg font-semibold flex items-center justify-center gap-2 mb-2">
+                <Lightbulb className="h-5 w-5 text-yellow-500" />
+                🎯 Traductions générées par l'IA
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                Voici comment l'IA a traduit votre question en requêtes Google Dork optimisées :
+              </p>
+            </div>
+            <div className="grid gap-4">
               {suggestions.map((suggestion, index) => (
-                <Card key={index} className="transition-all hover:shadow-md">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {getCategoryIcon(suggestion.category)}
-                        <CardTitle className="text-sm">{suggestion.description}</CardTitle>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-xs ${getCategoryColor(suggestion.category)}`}
-                        >
-                          {suggestion.category}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {Math.round(suggestion.confidence * 100)}%
-                        </Badge>
+                <Card key={index} className="transition-all hover:shadow-lg border-l-4 border-l-blue-400">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                          {getCategoryIcon(suggestion.category)}
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-base mb-1">{suggestion.description}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <Badge 
+                              variant="secondary" 
+                              className={`text-xs ${getCategoryColor(suggestion.category)}`}
+                            >
+                              {suggestion.category === 'academic' ? '🎓 Académique' :
+                               suggestion.category === 'development' ? '💻 Développement' :
+                               suggestion.category === 'security' ? '🔒 Sécurité' : '📄 Général'}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              Pertinence: {Math.round(suggestion.confidence * 100)}%
+                            </Badge>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-3">
-                      <Textarea
-                        value={suggestion.query}
-                        readOnly
-                        className="text-xs font-mono resize-none"
-                        rows={2}
-                      />
+                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                        <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                          🤖 Requête Google Dork générée :
+                        </div>
+                        <Textarea
+                          value={suggestion.query}
+                          readOnly
+                          className="text-sm font-mono resize-none border-0 bg-transparent p-0"
+                          rows={2}
+                        />
+                      </div>
                       
                       <div className="flex items-center justify-between">
                         <div className="flex flex-wrap gap-1">
+                          <span className="text-xs text-muted-foreground mr-2">Opérateurs utilisés :</span>
                           {suggestion.operators.map((operator, opIndex) => (
-                            <Badge key={opIndex} variant="outline" className="text-xs">
+                            <Badge key={opIndex} variant="outline" className="text-xs bg-blue-50 text-blue-700">
                               {operator}
                             </Badge>
                           ))}
@@ -274,17 +342,18 @@ export function GoogleDorkAI({ onQueryGenerated, initialQuery = "" }: GoogleDork
                             variant="ghost" 
                             size="sm" 
                             onClick={() => copySuggestion(suggestion.query)}
-                            className="h-7 px-2"
+                            className="h-8 px-3"
                           >
-                            <Copy className="h-3 w-3" />
+                            <Copy className="h-3 w-3 mr-1" />
+                            Copier
                           </Button>
                           <Button 
                             size="sm" 
                             onClick={() => applySuggestion(suggestion)}
-                            className="h-7 px-3 text-xs"
+                            className="h-8 px-4 text-xs bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
                           >
                             <Search className="h-3 w-3 mr-1" />
-                            Utiliser
+                            Rechercher
                           </Button>
                         </div>
                       </div>
@@ -297,17 +366,44 @@ export function GoogleDorkAI({ onQueryGenerated, initialQuery = "" }: GoogleDork
         )}
 
         {/* Guide d'utilisation */}
-        <div className="bg-muted/50 p-3 rounded-lg">
-          <div className="flex items-start gap-2">
-            <Lightbulb className="h-4 w-4 mt-0.5 text-yellow-500" />
-            <div className="text-sm space-y-1">
-              <p className="font-medium">Comment utiliser l'assistant IA :</p>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>• Décrivez votre recherche en langage naturel</li>
-                <li>• L'IA analyse le contexte et génère des requêtes optimisées</li>
-                <li>• Chaque suggestion est évaluée avec un score de confiance</li>
-                <li>• Les opérateurs utilisés sont affichés pour votre apprentissage</li>
-              </ul>
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 p-6 rounded-xl border">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h5 className="font-semibold text-base mb-3 text-blue-900 dark:text-blue-100">
+                🎯 Comment fonctionne le traducteur IA ?
+              </h5>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <h6 className="font-medium text-sm text-green-700 dark:text-green-400">
+                    ✅ Ce que vous pouvez dire :
+                  </h6>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• "Je veux des PDF sur l'IA"</li>
+                    <li>• "Code Python gratuit"</li>
+                    <li>• "Vulnérabilités récentes"</li>
+                    <li>• "Cours universitaires en ligne"</li>
+                  </ul>
+                </div>
+                <div className="space-y-3">
+                  <h6 className="font-medium text-sm text-blue-700 dark:text-blue-400">
+                    🤖 Ce que l'IA génère :
+                  </h6>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">filetype:pdf</code> pour les PDF</li>
+                    <li>• <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">site:github.com</code> pour le code</li>
+                    <li>• <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">after:2023-01-01</code> pour récent</li>
+                    <li>• <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">site:edu</code> pour universitaire</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  <strong>💡 Astuce :</strong> Plus vous êtes précis dans votre demande, plus l'IA pourra générer des requêtes pertinentes avec les bons opérateurs Google Dork !
+                </p>
+              </div>
             </div>
           </div>
         </div>
