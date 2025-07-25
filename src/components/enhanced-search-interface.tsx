@@ -3,10 +3,10 @@ import { Search, Sparkles, Settings, Code2, Brain, History, Star } from "lucide-
 import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
 import { UnifiedSearch } from "./unified-search";
-import { GoogleDorkBuilder } from "./google-dork-builder";
+
 import { GoogleDorkAI } from "./google-dork-ai";
 import { EnhancedSearchHistory } from "./enhanced-search-history";
-import { SmartSearchSuggestions } from "./smart-search-suggestions";
+
 import { SavedSearches } from "./saved-searches";
 import { CollapsiblePanel } from "./collapsible-panel";
 
@@ -66,9 +66,7 @@ export function EnhancedSearchInterface({
           <CollapsiblePanel title="AI Google Dork Translator" icon={Brain}>
             <GoogleDorkAI onQueryGenerated={onSearch} />
           </CollapsiblePanel>
-          <CollapsiblePanel title="Google Dork Builder" icon={Code2}>
-            <GoogleDorkBuilder onQueryGenerated={onSearch} />
-          </CollapsiblePanel>
+
           <CollapsiblePanel title="Search History" icon={History}>
             <EnhancedSearchHistory
               searchHistory={searchHistory}
@@ -78,9 +76,7 @@ export function EnhancedSearchInterface({
               onUpdateHistory={onUpdateHistory}
             />
           </CollapsiblePanel>
-          <CollapsiblePanel title="Smart Suggestions" icon={Star}>
-            <SmartSearchSuggestions onApplyShortcut={onApplyShortcut} />
-          </CollapsiblePanel>
+
           <CollapsiblePanel title="Saved Searches" icon={Star}>
             <SavedSearches onApplySearch={onSearch} />
           </CollapsiblePanel>
