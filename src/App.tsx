@@ -15,7 +15,7 @@ interface SearchHistory {
   timestamp: Date;
   searchEngine: TSearchEngine;
   isFavorite?: boolean;
-  tags?: string[];
+
   category?: string;
   notes?: string;
 }
@@ -54,16 +54,7 @@ const App = () => {
     localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
   }, [searchHistory]);
 
-  const addToHistory = useCallback((query: string) => {
-    const newEntry: SearchHistory = {
-      id: Date.now().toString(),
-      query,
-      timestamp: new Date(),
-      searchEngine
-    };
-    
-    setSearchHistory(prev => [newEntry, ...prev.slice(0, 9)]); // Keep only 10 most recent
-  }, [searchEngine]);
+
 
   const executeSearch = useCallback((queryString: string) => {
     if (!queryString.trim()) {
@@ -133,13 +124,7 @@ const App = () => {
     });
   }, [toast]);
 
-  const applySearchShortcut = useCallback((_shortcut: any) => {
-    setCurrentView('search');
-    toast({
-      title: "Raccourci appliqué",
-      description: "Le raccourci a été appliqué avec succès.",
-    });
-  }, [toast]);
+
 
   return (
     <SettingApiProvider>
@@ -192,13 +177,13 @@ const App = () => {
               {/* Interface de recherche unifiée avec onglets améliorés */}
               <EnhancedSearchInterface
                 onSearch={executeSearch}
-                onAddToHistory={addToHistory}
+                
                 searchHistory={searchHistory}
                 onLoadFromHistory={loadFromHistory}
                 onExportHistory={exportHistory}
                 onClearHistory={clearHistory}
                 onUpdateHistory={setSearchHistory}
-                onApplyShortcut={applySearchShortcut}
+
               />
             </div>
           )}

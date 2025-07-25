@@ -1,5 +1,4 @@
-import { useState, useCallback } from "react";
-import { Brain, History } from "lucide-react";
+import { History } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
 import { GoogleDorkAI } from "./google-dork-ai";
@@ -8,7 +7,7 @@ import { CollapsiblePanel } from "./collapsible-panel";
 
 interface EnhancedSearchInterfaceProps {
   onSearch: (query: string) => void;
-  onAddToHistory: (query: string) => void;
+  
   searchHistory: any[];
   onLoadFromHistory: (historyItem: any) => void;
   onExportHistory: () => void;
@@ -18,7 +17,7 @@ interface EnhancedSearchInterfaceProps {
 
 export function EnhancedSearchInterface({
   onSearch,
-  onAddToHistory,
+  
   searchHistory,
   onLoadFromHistory,
   onExportHistory,
