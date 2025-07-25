@@ -39,7 +39,7 @@ const categories = [
   "Autre"
 ];
 
-export function EnhancedSearchHistory({ 
+export function SearchHistory({ 
   searchHistory, 
   onLoadFromHistory, 
   onClearHistory, 

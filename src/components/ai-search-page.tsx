@@ -1,11 +1,11 @@
 import { History } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
-import { GoogleDorkAI } from "./google-dork-ai";
-import { EnhancedSearchHistory } from "./enhanced-search-history";
+import { AiTranslator } from "./ai-translator";
+import { SearchHistory } from "./search-history";
 import { CollapsiblePanel } from "./collapsible-panel";
 
-interface EnhancedSearchInterfaceProps {
+interface AiSearchPageProps {
   onSearch: (query: string) => void;
   
   searchHistory: any[];
@@ -15,7 +15,7 @@ interface EnhancedSearchInterfaceProps {
   onUpdateHistory: (updatedHistory: any[]) => void;
 }
 
-export function EnhancedSearchInterface({
+export function AiSearchPage({
   onSearch,
   
   searchHistory,
@@ -23,7 +23,7 @@ export function EnhancedSearchInterface({
   onExportHistory,
   onClearHistory,
   onUpdateHistory,
-}: EnhancedSearchInterfaceProps) {
+}: AiSearchPageProps) {
   return (
     <motion.div 
       className="w-full max-w-6xl mx-auto space-y-6"
@@ -52,9 +52,9 @@ export function EnhancedSearchInterface({
 
       <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-sm">
         <CardContent className="p-8 space-y-6">
-          <GoogleDorkAI onQueryGenerated={onSearch} />
+          <AiTranslator onQueryGenerated={onSearch} />
           <CollapsiblePanel title="Search History" icon={History}>
-            <EnhancedSearchHistory
+            <SearchHistory
               searchHistory={searchHistory}
               onLoadFromHistory={onLoadFromHistory}
               onExportHistory={onExportHistory}

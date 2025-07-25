@@ -5,7 +5,7 @@ import { TSearchEngine } from "./types";
 import { SettingApiProvider } from "./contexts/settingApi";
 import { useToast } from "./hooks/use-toast";
 import { SettingsPage } from '@/components/settings-page';
-import { EnhancedSearchInterface } from './components/enhanced-search-interface';
+import { AiSearchPage } from './components/ai-search-page';
 import { HomeStats } from "./components/home-stats";
 import { HeroSection } from "./components/hero-section";
 
@@ -175,7 +175,7 @@ const App = () => {
             /* Search View */
             <div className="space-y-8 py-8">
               {/* Interface de recherche unifiée avec onglets améliorés */}
-              <EnhancedSearchInterface
+              <AiSearchPage
                 onSearch={executeSearch}
                 
                 searchHistory={searchHistory}

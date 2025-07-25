@@ -6,7 +6,7 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "../hooks/use-toast";
 
-interface GoogleDorkAIProps {
+interface AiTranslatorProps {
   onQueryGenerated: (query: string) => void;
   initialQuery?: string;
 }
@@ -26,7 +26,7 @@ async function getAIResponse(input: string): Promise<string> {
   });
 }
 
-export function GoogleDorkAI({ onQueryGenerated, initialQuery = "" }: GoogleDorkAIProps) {
+export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslatorProps) {
   const { toast } = useToast();
   const [userInput, setUserInput] = useState(initialQuery);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
