@@ -28,7 +28,7 @@ async function getAIResponse(input: string): Promise<string> {
 
 export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslatorProps) {
   const { toast } = useToast();
-  const [userInput, setUserInput] = useState(initialQuery);
+    const [userInput, setUserInput] = useState(initialQuery || "");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [generatedQuery, setGeneratedQuery] = useState("");
 

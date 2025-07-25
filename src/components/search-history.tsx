@@ -403,6 +403,9 @@ export function SearchHistory({
                           <span className="px-2 py-1 bg-muted rounded text-xs">
                             {item.searchEngine}
                           </span>
+                          <span className="px-2 py-1 bg-muted rounded text-xs">
+                            Recherché {searchHistory.filter(h => h.query === item.query).length} fois
+                          </span>
                         </div>
                       </div>
                     </AccordionTrigger>

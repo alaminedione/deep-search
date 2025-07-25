@@ -12,7 +12,8 @@ interface AiSearchPageProps {
   onLoadFromHistory: (historyItem: any) => void;
   onExportHistory: () => void;
   onClearHistory: () => void;
-  onUpdateHistory: (updatedHistory: any[]) => void;
+    onUpdateHistory: (updatedHistory: any[]) => void;
+  queryToLoad?: string;
 }
 
 export function AiSearchPage({
@@ -22,7 +23,8 @@ export function AiSearchPage({
   onLoadFromHistory,
   onExportHistory,
   onClearHistory,
-  onUpdateHistory,
+    onUpdateHistory,
+  queryToLoad,
 }: AiSearchPageProps) {
   return (
     <motion.div 
@@ -52,7 +54,7 @@ export function AiSearchPage({
 
       <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-sm">
         <CardContent className="p-8 space-y-6">
-          <AiTranslator onQueryGenerated={onSearch} />
+          <AiTranslator onQueryGenerated={onSearch} initialQuery={queryToLoad} />
           <CollapsiblePanel title="Search History" icon={History}>
             <SearchHistory
               searchHistory={searchHistory}

@@ -25,7 +25,8 @@ const App = () => {
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [currentView, setCurrentView] = useState<'home' | 'search'>('home');
   const defaultSearchEngine: TSearchEngine = "google.com"
-  const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
+    const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
+  const [queryToLoad, setQueryToLoad] = useState<string>("");
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -117,7 +118,9 @@ const App = () => {
     });
   }, [toast]);
 
-  const loadFromHistory = useCallback((_historyItem: SearchHistory) => {
+  const loadFromHistory = useCallback((historyItem: SearchHistory) => {
+    setQueryToLoad(historyItem.query);
+    setCurrentView('search');
     toast({
       title: "Recherche chargée",
       description: "La recherche de l'historique a été chargée.",
@@ -183,6 +186,7 @@ const App = () => {
                 onExportHistory={exportHistory}
                 onClearHistory={clearHistory}
                 onUpdateHistory={setSearchHistory}
+                queryToLoad={queryToLoad}
 
               />
             </div>
