@@ -1,13 +1,9 @@
 import { useState, useCallback } from "react";
-import { Search, Sparkles, Settings, Code2, Brain, History, Star } from "lucide-react";
+import { Brain, History } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
-import { UnifiedSearch } from "./unified-search";
-
 import { GoogleDorkAI } from "./google-dork-ai";
 import { EnhancedSearchHistory } from "./enhanced-search-history";
-
-import { SavedSearches } from "./saved-searches";
 import { CollapsiblePanel } from "./collapsible-panel";
 
 interface EnhancedSearchInterfaceProps {
@@ -18,7 +14,6 @@ interface EnhancedSearchInterfaceProps {
   onExportHistory: () => void;
   onClearHistory: () => void;
   onUpdateHistory: (updatedHistory: any[]) => void;
-  onApplyShortcut: (shortcut: any) => void;
 }
 
 export function EnhancedSearchInterface({
@@ -29,7 +24,6 @@ export function EnhancedSearchInterface({
   onExportHistory,
   onClearHistory,
   onUpdateHistory,
-  onApplyShortcut
 }: EnhancedSearchInterfaceProps) {
   return (
     <motion.div 
@@ -45,7 +39,7 @@ export function EnhancedSearchInterface({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          Enhanced Search Interface
+          AI-Powered Search
         </motion.h2>
         <motion.p 
           className="text-muted-foreground max-w-2xl mx-auto text-lg"
@@ -53,20 +47,13 @@ export function EnhancedSearchInterface({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          Explore all search possibilities with our specialized tools
+          Describe what you're looking for, and let the AI do the rest.
         </motion.p>
       </div>
 
       <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-sm">
         <CardContent className="p-8 space-y-6">
-          <UnifiedSearch 
-            onSearch={onSearch}
-            onAddToHistory={onAddToHistory}
-          />
-          <CollapsiblePanel title="AI Google Dork Translator" icon={Brain}>
-            <GoogleDorkAI onQueryGenerated={onSearch} />
-          </CollapsiblePanel>
-
+          <GoogleDorkAI onQueryGenerated={onSearch} />
           <CollapsiblePanel title="Search History" icon={History}>
             <EnhancedSearchHistory
               searchHistory={searchHistory}
@@ -75,10 +62,6 @@ export function EnhancedSearchInterface({
               onClearHistory={onClearHistory}
               onUpdateHistory={onUpdateHistory}
             />
-          </CollapsiblePanel>
-
-          <CollapsiblePanel title="Saved Searches" icon={Star}>
-            <SavedSearches onApplySearch={onSearch} />
           </CollapsiblePanel>
         </CardContent>
       </Card>
