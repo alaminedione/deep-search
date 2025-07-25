@@ -1,13 +1,15 @@
-import { useState, useCallback, useMemo } from "react";
-import { Code2, Copy, RefreshCw, Lightbulb, Search } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { Code2, Copy, RefreshCw, Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Badge } from "./ui/badge";
 import { useToast } from "../hooks/use-toast";
+import { CollapsiblePanel } from "./collapsible-panel";
 
-// Types pour les opérateurs Google Dorks
+// (The GOOGLE_DORK_OPERATORS and QUERY_TEMPLATES constants remain the same)
+
 interface DorkOperator {
   name: string;
   syntax: string;
@@ -17,7 +19,6 @@ interface DorkOperator {
   requiresValue: boolean;
 }
 
-// Liste complète des opérateurs Google Dorks basée sur les meilleures pratiques
 const GOOGLE_DORK_OPERATORS: DorkOperator[] = [
   // Basic Search Operators
   { name: 'Site', syntax: 'site:', description: 'Recherche sur un site spécifique', example: 'site:github.com', category: 'basic', requiresValue: true },
@@ -115,8 +116,6 @@ const GOOGLE_DORK_OPERATORS: DorkOperator[] = [
   { name: 'Khan Academy', syntax: 'site:khanacademy.org', description: 'Ressources Khan Academy', example: 'site:khanacademy.org "mathematics"', category: 'education', requiresValue: false },
   { name: 'MIT OpenCourseWare', syntax: 'site:ocw.mit.edu', description: 'Cours MIT gratuits', example: 'site:ocw.mit.edu "computer science"', category: 'education', requiresValue: false },
 ];
-
-// Templates de requêtes prédéfinies
 const QUERY_TEMPLATES = {
   academic: {
     name: 'Recherche académique',
@@ -211,202 +210,112 @@ export function GoogleDorkBuilder({ onQueryGenerated, initialQuery = "" }: Googl
   const [selectedOperators, setSelectedOperators] = useState<Array<{operator: DorkOperator, value: string}>>([]);
   const [excludeTerms, setExcludeTerms] = useState<string[]>([]);
   const [includeTerms, setIncludeTerms] = useState<string[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Génération de la requête finale avec syntaxe corrigée
   const generatedQuery = useMemo(() => {
     let query = baseQuery.trim();
-    
-    // Ajouter les termes obligatoires (sans parenthèses pour un seul terme)
     if (includeTerms.length > 0) {
-      if (includeTerms.length === 1) {
-        query = `${query} +"${includeTerms[0]}"`.trim();
-      } else {
-        const terms = includeTerms.map(term => `+"${term}"`).join(' ');
-        query = `${query} ${terms}`.trim();
-      }
+      query += ` ${includeTerms.map(term => `"${term}"`).join(" " )}`;
     }
-    
-    // Grouper les opérateurs par type pour une syntaxe optimisée
-    const operatorGroups: Record<string, string[]> = {};
+    if (excludeTerms.length > 0) {
+      query += ` ${excludeTerms.map(term => `-"${term}"`).join(" " )}`;
+    }
     selectedOperators.forEach(({ operator, value }) => {
       if (value.trim()) {
-        let processedValue = value.trim();
-        
-        // Auto-compléter les sites communs
-        if (operator.syntax === 'site:' && !processedValue.includes('.')) {
-          processedValue = `${processedValue}.com`;
-        }
-        
-        if (!operatorGroups[operator.syntax]) {
-          operatorGroups[operator.syntax] = [];
-        }
-        operatorGroups[operator.syntax].push(processedValue);
+        query += ` ${operator.syntax}${value.trim()}`;
       }
     });
-    
-    // Construire la requête avec la syntaxe correcte
-    Object.entries(operatorGroups).forEach(([syntax, values]) => {
-      if (values.length === 1) {
-        // Un seul paramètre : pas de parenthèses
-        query += ` ${syntax}${values[0]}`;
-      } else {
-        // Plusieurs paramètres : utiliser des parenthèses avec OR
-        query += ` (${values.map(value => `${syntax}${value}`).join(' OR ')})`;
-      }
-    });
-    
-    // Exclure les termes (sans parenthèses pour un seul terme)
-    if (excludeTerms.length > 0) {
-      if (excludeTerms.length === 1) {
-        query = `${query} -"${excludeTerms[0]}"`.trim();
-      } else {
-        const terms = excludeTerms.map(term => `-"${term}"`).join(' ');
-        query = `${query} ${terms}`.trim();
-      }
-    }
-    
-    return query;
+    return query.trim();
   }, [baseQuery, selectedOperators, excludeTerms, includeTerms]);
 
-  // Ajouter un opérateur
   const addOperator = useCallback((operator: DorkOperator) => {
     setSelectedOperators(prev => [...prev, { operator, value: '' }]);
   }, []);
 
-  // Supprimer un opérateur
   const removeOperator = useCallback((index: number) => {
     setSelectedOperators(prev => prev.filter((_, i) => i !== index));
   }, []);
 
-  // Mettre à jour la valeur d'un opérateur
   const updateOperatorValue = useCallback((index: number, value: string) => {
-    setSelectedOperators(prev => prev.map((item, i) => 
-      i === index ? { ...item, value } : item
-    ));
+    setSelectedOperators(prev => prev.map((item, i) => (i === index ? { ...item, value } : item)));
   }, []);
 
-  // Appliquer un template
-  const applyTemplate = useCallback((templateKey: string) => {
-    const template = QUERY_TEMPLATES[templateKey as keyof typeof QUERY_TEMPLATES];
-    if (template) {
-      const query = template.template.replace('{query}', baseQuery || 'recherche');
-      onQueryGenerated(query);
-      setSelectedTemplate(templateKey);
-      toast({
-        title: "Template appliqué",
-        description: `Template "${template.name}" appliqué avec succès.`,
-      });
-    }
-  }, [baseQuery, onQueryGenerated, toast]);
-
-  // Copier la requête
   const copyQuery = useCallback(() => {
     navigator.clipboard.writeText(generatedQuery);
-    toast({
-      title: "Requête copiée",
-      description: "La requête a été copiée dans le presse-papiers.",
-    });
+    toast({ title: "Query copied to clipboard!" });
   }, [generatedQuery, toast]);
 
-  // Réinitialiser
   const resetBuilder = useCallback(() => {
-    setBaseQuery('');
+    setBaseQuery("");
     setSelectedOperators([]);
     setExcludeTerms([]);
     setIncludeTerms([]);
-    setSelectedTemplate('');
+    setSearchTerm("");
   }, []);
 
-  // Ajouter un terme à exclure
-  const addExcludeTerm = useCallback((term: string) => {
-    if (term.trim() && !excludeTerms.includes(term.trim())) {
-      setExcludeTerms(prev => [...prev, term.trim()]);
-    }
-  }, [excludeTerms]);
+  const filteredOperators = useMemo(() => {
+    return GOOGLE_DORK_OPERATORS.filter(op => op.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [searchTerm]);
 
-  // Ajouter un terme à inclure
-  const addIncludeTerm = useCallback((term: string) => {
-    if (term.trim() && !includeTerms.includes(term.trim())) {
-      setIncludeTerms(prev => [...prev, term.trim()]);
-    }
-  }, [includeTerms]);
-
-  // Grouper les opérateurs par catégorie
   const operatorsByCategory = useMemo(() => {
-    return GOOGLE_DORK_OPERATORS.reduce((acc, operator) => {
+    return filteredOperators.reduce((acc, operator) => {
       if (!acc[operator.category]) {
         acc[operator.category] = [];
       }
       acc[operator.category].push(operator);
       return acc;
     }, {} as Record<string, DorkOperator[]>);
-  }, []);
+  }, [filteredOperators]);
 
   return (
     <div className="space-y-6 p-4 border rounded-lg bg-card">
       <div className="flex items-center gap-2">
         <Code2 className="h-5 w-5" />
-        <h3 className="text-lg font-semibold">Constructeur Google Dorks</h3>
+        <h3 className="text-lg font-semibold">Google Dork Builder</h3>
       </div>
 
-      {/* Requête de base */}
       <div className="space-y-2">
-        <Label htmlFor="base-query">Requête de base</Label>
+        <Label htmlFor="base-query">Base Query</Label>
         <Input
           id="base-query"
-          placeholder="Entrez vos mots-clés principaux..."
+          placeholder="Enter your main keywords..."
           value={baseQuery}
           onChange={(e) => setBaseQuery(e.target.value)}
         />
       </div>
 
-      {/* Templates rapides */}
-      <div className="space-y-3">
-        <Label>Templates rapides</Label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {Object.entries(QUERY_TEMPLATES).map(([key, template]) => (
-            <Button
-              key={key}
-              variant={selectedTemplate === key ? "default" : "outline"}
-              size="sm"
-              onClick={() => applyTemplate(key)}
-              className="text-xs"
-            >
-              {template.name}
-            </Button>
+      <div className="space-y-2">
+        <Label>Operators</Label>
+        <Input
+          placeholder="Search for an operator..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <div className="space-y-2">
+          {Object.entries(operatorsByCategory).map(([category, operators]) => (
+            <CollapsiblePanel key={category} title={category} icon={Code2}>
+              <div className="flex flex-wrap gap-1">
+                {operators.map((operator) => (
+                  <Button
+                    key={operator.syntax}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addOperator(operator)}
+                    className="text-xs h-7"
+                    title={operator.description}
+                  >
+                    {operator.name}
+                  </Button>
+                ))}
+              </div>
+            </CollapsiblePanel>
           ))}
         </div>
       </div>
 
-      {/* Opérateurs par catégorie */}
-      <div className="space-y-4">
-        <Label>Opérateurs Google Dorks</Label>
-        {Object.entries(operatorsByCategory).map(([category, operators]) => (
-          <div key={category} className="space-y-2">
-            <h4 className="text-sm font-medium capitalize">{category}</h4>
-            <div className="flex flex-wrap gap-1">
-              {operators.map((operator) => (
-                <Button
-                  key={operator.syntax}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => addOperator(operator)}
-                  className="text-xs h-7"
-                  title={operator.description}
-                >
-                  {operator.name}
-                </Button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Opérateurs sélectionnés */}
       {selectedOperators.length > 0 && (
         <div className="space-y-3">
-          <Label>Opérateurs configurés</Label>
+          <Label>Configured Operators</Label>
           <div className="space-y-2">
             {selectedOperators.map(({ operator, value }, index) => (
               <div key={index} className="flex items-center gap-2">
@@ -430,127 +339,27 @@ export function GoogleDorkBuilder({ onQueryGenerated, initialQuery = "" }: Googl
         </div>
       )}
 
-      {/* Termes à inclure/exclure */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Termes obligatoires</Label>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Terme à inclure"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  addIncludeTerm(e.currentTarget.value);
-                  e.currentTarget.value = '';
-                }
-              }}
-            />
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {includeTerms.map((term, index) => (
-              <Badge key={index} variant="default" className="text-xs">
-                +{term}
-                <button
-                  onClick={() => setIncludeTerms(prev => prev.filter((_, i) => i !== index))}
-                  className="ml-1"
-                >
-                  ×
-                </button>
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Termes à exclure</Label>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Terme à exclure"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  addExcludeTerm(e.currentTarget.value);
-                  e.currentTarget.value = '';
-                }
-              }}
-            />
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {excludeTerms.map((term, index) => (
-              <Badge key={index} variant="destructive" className="text-xs">
-                -{term}
-                <button
-                  onClick={() => setExcludeTerms(prev => prev.filter((_, i) => i !== index))}
-                  className="ml-1"
-                >
-                  ×
-                </button>
-              </Badge>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Requête générée */}
       <div className="space-y-2">
-        <Label>Requête générée</Label>
+        <Label>Generated Query</Label>
         <Textarea
           value={generatedQuery}
           readOnly
           className="min-h-[80px] font-mono text-sm"
-          placeholder="Votre requête Google Dorks apparaîtra ici..."
+          placeholder="Your Google Dork query will appear here..."
         />
-      </div>
-
-      {/* Actions */}
-      <div className="flex flex-wrap gap-2">
-        <Button 
-          onClick={() => onQueryGenerated(generatedQuery)}
-          disabled={!generatedQuery.trim()}
-          className="flex-1"
-        >
-          <Search className="h-4 w-4 mr-2" />
-          Utiliser cette requête
-        </Button>
-        <Button variant="outline" onClick={copyQuery} disabled={!generatedQuery.trim()}>
-          <Copy className="h-4 w-4 mr-2" />
-          Copier
-        </Button>
-        <Button variant="outline" onClick={resetBuilder}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Réinitialiser
-        </Button>
-      </div>
-
-      {/* Conseils améliorés */}
-      <div className="bg-muted p-3 rounded-lg">
-        <div className="flex items-start gap-2">
-          <Lightbulb className="h-4 w-4 mt-0.5 text-yellow-500" />
-          <div className="text-sm space-y-2">
-            <p className="font-medium">Conseils pour des recherches optimales :</p>
-            <div className="grid md:grid-cols-2 gap-3 text-xs text-muted-foreground">
-              <div>
-                <p className="font-medium text-foreground mb-1">Syntaxe de base :</p>
-                <ul className="space-y-1">
-                  <li>• Un seul paramètre : <code>filetype:pdf</code></li>
-                  <li>• Plusieurs paramètres : <code>(filetype:pdf OR filetype:doc)</code></li>
-                  <li>• Phrases exactes : <code>"machine learning"</code></li>
-                  <li>• Exclusion : <code>-"publicité"</code></li>
-                </ul>
-              </div>
-              <div>
-                <p className="font-medium text-foreground mb-1">Opérateurs avancés :</p>
-                <ul className="space-y-1">
-                  <li>• Dates : <code>after:2023-01-01</code></li>
-                  <li>• Proximité : <code>python NEAR:5 tutorial</code></li>
-                  <li>• Prix : <code>$100..$500</code></li>
-                  <li>• Plages : <code>numrange:100-500</code></li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-2 p-2 bg-background rounded border">
-              <p className="font-medium text-xs text-foreground">Exemple de requête complexe :</p>
-              <code className="text-xs">"machine learning" (site:github.com OR site:arxiv.org) filetype:pdf after:2023-01-01 -"advertisement"</code>
-            </div>
-          </div>
+        <div className="flex gap-2">
+          <Button onClick={() => onQueryGenerated(generatedQuery)} className="w-full">
+            <Search className="h-4 w-4 mr-2" />
+            Search
+          </Button>
+          <Button variant="outline" onClick={copyQuery} className="w-full">
+            <Copy className="h-4 w-4 mr-2" />
+            Copy
+          </Button>
+          <Button variant="destructive" onClick={resetBuilder} className="w-full">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Reset
+          </Button>
         </div>
       </div>
     </div>
