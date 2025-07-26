@@ -1,31 +1,13 @@
-import { History } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
 import { AiTranslator } from "./ai-translator";
-import { SearchHistory as SearchHistoryComponent } from "./search-history";
-import { CollapsiblePanel } from "./collapsible-panel";
-import { SearchHistory } from "@/types";
 
 interface AiSearchPageProps {
   onSearch: (query: string) => void;
-  
-  searchHistory: SearchHistory[];
-  onLoadFromHistory: (historyItem: SearchHistory) => void;
-  onExportHistory: () => void;
-  onClearHistory: () => void;
-  onUpdateHistory: (updatedHistory: SearchHistory[]) => void;
-  queryToLoad?: string;
 }
 
 export function AiSearchPage({
   onSearch,
-  
-  searchHistory,
-  onLoadFromHistory,
-  onExportHistory,
-  onClearHistory,
-  onUpdateHistory,
-  queryToLoad,
 }: AiSearchPageProps) {
   return (
     <motion.div 
@@ -55,16 +37,7 @@ export function AiSearchPage({
 
       <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-sm">
         <CardContent className="p-8 space-y-6">
-          <AiTranslator onQueryGenerated={onSearch} initialQuery={queryToLoad} />
-          <CollapsiblePanel title="Search History" icon={History}>
-            <SearchHistoryComponent
-              searchHistory={searchHistory}
-              onLoadFromHistory={onLoadFromHistory}
-              onExportHistory={onExportHistory}
-              onClearHistory={onClearHistory}
-              onUpdateHistory={onUpdateHistory}
-            />
-          </CollapsiblePanel>
+          <AiTranslator onQueryGenerated={onSearch} />
         </CardContent>
       </Card>
     </motion.div>

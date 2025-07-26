@@ -14,25 +14,6 @@ export interface TInputTags {
 
 export type TSearchEngine = "duckduckgo.com" | "google.com"
 
-export interface SearchHistory {
-  id: string;
-  query: string;
-  timestamp: Date;
-  searchEngine: TSearchEngine;
-  isFavorite?: boolean;
-  tags?: string[];
-  category?: string;
-  notes?: string;
-}
-
-export type SearchBarProps = {
-  setSearchText: React.Dispatch<React.SetStateAction<string>>;
-  searchText: string;
-  searchEngine: string;
-  currentSearchData?: SearchHistory;
-  onApplyAdvancedSearch?: (searchData: SearchHistory) => void;
-};
-
 export interface propsSettingSearchEngine {
   searchEngine: TSearchEngine,
   setSearchEngine: React.Dispatch<SetStateAction<TSearchEngine>>

@@ -9,53 +9,36 @@ import { AiSearchPage } from './components/ai-search-page';
 import { HomeStats } from "./components/home-stats";
 import { HeroSection } from "./components/hero-section";
 
-interface SearchHistory {
-  id: string;
-  query: string;
-  timestamp: Date;
-  searchEngine: TSearchEngine;
-  isFavorite?: boolean;
-
-  category?: string;
-  notes?: string;
-}
-
 const App = () => {
   const { toast } = useToast();
-  const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [currentView, setCurrentView] = useState<'home' | 'search'>('home');
   const defaultSearchEngine: TSearchEngine = "google.com"
-    const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
-  const [queryToLoad, setQueryToLoad] = useState<string>("");
+  const [searchEngine, setSearchEngine] = useState<TSearchEngine>(defaultSearchEngine)
+  const [searchTimestamps, setSearchTimestamps] = useState<number[]>(() => {
+    const storedTimestamps = localStorage.getItem("searchTimestamps");
+    if (storedTimestamps) {
+      try {
+        return JSON.parse(storedTimestamps);
+      } catch (error) {
+        console.error("Error parsing search timestamps from localStorage:", error);
+        return [];
+      }
+    }
+    return [];
+  });
 
   // Load settings from localStorage on mount
   useEffect(() => {
     const storedSearchEngine = localStorage.getItem("searchEngine");
-    const storedHistory = localStorage.getItem("searchHistory");
-    
     if (storedSearchEngine) {
       setSearchEngine(storedSearchEngine as TSearchEngine);
     }
-    
-    if (storedHistory) {
-      try {
-        const parsedHistory = JSON.parse(storedHistory).map((item: SearchHistory) => ({
-          ...item,
-          timestamp: new Date(item.timestamp)
-        }));
-        setSearchHistory(parsedHistory);
-      } catch (error) {
-        console.error("Error parsing search history:", error);
-      }
-    }
   }, []);
 
-  // Save search history to localStorage
+  // Save search timestamps to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
-  }, [searchHistory]);
-
-
+    localStorage.setItem("searchTimestamps", JSON.stringify(searchTimestamps));
+  }, [searchTimestamps]);
 
   const executeSearch = useCallback((queryString: string) => {
     if (!queryString.trim()) {
@@ -81,6 +64,9 @@ const App = () => {
 
       window.open(searchUrl, '_blank');
       
+      // Record the timestamp of the successful search
+      setSearchTimestamps(prev => [...prev, Date.now()]);
+
       toast({
         title: "Recherche lancée",
         description: "Votre recherche a été ouverte dans un nouvel onglet.",
@@ -94,38 +80,6 @@ const App = () => {
     }
   }, [searchEngine, toast]);
 
-  const exportHistory = useCallback(() => {
-    const dataStr = JSON.stringify(searchHistory, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'deep-search-history.json';
-    link.click();
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Historique exporté",
-      description: "L'historique a été téléchargé avec succès.",
-    });
-  }, [searchHistory, toast]);
-
-  const clearHistory = useCallback(() => {
-    setSearchHistory([]);
-    toast({
-      title: "Historique effacé",
-      description: "L'historique des recherches a été supprimé.",
-    });
-  }, [toast]);
-
-  const loadFromHistory = useCallback((historyItem: SearchHistory) => {
-    setQueryToLoad(historyItem.query);
-    setCurrentView('search');
-    toast({
-      title: "Recherche chargée",
-      description: "La recherche de l'historique a été chargée.",
-    });
-  }, [toast]);
 
 
 
@@ -171,7 +125,7 @@ const App = () => {
               
               {/* Home Statistics */}
               <div className="flex justify-center">
-                <HomeStats searchHistory={searchHistory} />
+                <HomeStats searchTimestamps={searchTimestamps} />
               </div>
             </div>
           ) : (
@@ -180,14 +134,6 @@ const App = () => {
               {/* Interface de recherche unifiée avec onglets améliorés */}
               <AiSearchPage
                 onSearch={executeSearch}
-                
-                searchHistory={searchHistory}
-                onLoadFromHistory={loadFromHistory}
-                onExportHistory={exportHistory}
-                onClearHistory={clearHistory}
-                onUpdateHistory={setSearchHistory}
-                queryToLoad={queryToLoad}
-
               />
             </div>
           )}

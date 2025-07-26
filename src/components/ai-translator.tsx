@@ -11,13 +11,12 @@ import { INSTRUCTION } from "./constants";
 
 interface AiTranslatorProps {
   onQueryGenerated: (query: string) => void;
-  initialQuery?: string;
 }
 
-export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslatorProps) {
+export function AiTranslator({ onQueryGenerated }: AiTranslatorProps) {
   const { toast } = useToast();
   const { provider, model, apiKey, configured } = useSettingApi();
-  const [userInput, setUserInput] = useState(initialQuery || "");
+  const [userInput, setUserInput] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [generatedQuery, setGeneratedQuery] = useState("");
 

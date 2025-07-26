@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from './ui/card';
-import { Search, Clock, Star, TrendingUp } from 'lucide-react';
-import { SearchHistory } from '@/types';
+import { Search, Clock, TrendingUp } from 'lucide-react';
 
 interface HomeStatsProps {
-  searchHistory: SearchHistory[];
+  searchTimestamps: number[];
 }
 
-export const HomeStats = ({ searchHistory }: HomeStatsProps) => {
+export const HomeStats = ({ searchTimestamps }: HomeStatsProps) => {
   const [stats, setStats] = useState({
     totalSearches: 0,
     todaySearches: 0,
-    favoriteSearches: 0,
     avgSearchesPerDay: 0
   });
 
@@ -20,29 +18,28 @@ export const HomeStats = ({ searchHistory }: HomeStatsProps) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const todaySearches = searchHistory.filter(search => {
-      const searchDate = new Date(search.timestamp);
+    const todaySearches = searchTimestamps.filter(timestamp => {
+      const searchDate = new Date(timestamp);
       searchDate.setHours(0, 0, 0, 0);
       return searchDate.getTime() === today.getTime();
     }).length;
 
-    const favoriteSearches = searchHistory.filter(search => search.isFavorite).length;
-
     // Calculate average searches per day (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentSearches = searchHistory.filter(search => 
-      new Date(search.timestamp) >= sevenDaysAgo
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const recentSearches = searchTimestamps.filter(timestamp => 
+      new Date(timestamp) >= sevenDaysAgo
     );
     const avgSearchesPerDay = Math.round(recentSearches.length / 7);
 
     setStats({
-      totalSearches: searchHistory.length,
+      totalSearches: searchTimestamps.length,
       todaySearches,
-      favoriteSearches,
       avgSearchesPerDay
     });
-  }, [searchHistory]);
+  }, [searchTimestamps]);
 
   const statCards = [
     {
@@ -56,12 +53,6 @@ export const HomeStats = ({ searchHistory }: HomeStatsProps) => {
       value: stats.todaySearches,
       icon: Clock,
       gradient: "from-emerald-500 to-emerald-600"
-    },
-    {
-      title: "Favoris",
-      value: stats.favoriteSearches,
-      icon: Star,
-      gradient: "from-amber-500 to-amber-600"
     },
     {
       title: "Moyenne/jour",
