@@ -7,6 +7,7 @@ import { Textarea } from "./ui/textarea";
 import { useToast } from "../hooks/use-toast";
 import { useSettingApi } from "../contexts/settingApi";
 import { getAICompletion } from "../lib/ai";
+import { INSTRUCTION } from "./constants";
 
 interface AiTranslatorProps {
   onQueryGenerated: (query: string) => void;
@@ -34,12 +35,11 @@ export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslat
     setIsAnalyzing(true);
     try {
       const response = await getAICompletion(
-        `Traduisez la demande suivante en une requête Google Dork : "${userInput}"`, 
-        provider, 
+        ` this is the user input : ${userInput} \n ${INSTRUCTION}`,
+        provider,
         model,
         apiKey
-      );
-      setGeneratedQuery(response.content);
+      ); setGeneratedQuery(response.content);
       toast({
         title: "Dork Google généré par l'IA",
         description: "L'IA a généré un dork Google pour votre requête.",
@@ -95,7 +95,7 @@ export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslat
               onChange={(e) => setUserInput(e.target.value)}
               className="h-12 text-base"
             />
-            <Button 
+            <Button
               onClick={generateDork}
               disabled={!userInput.trim() || isAnalyzing || !configured}
               className="h-12 px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
