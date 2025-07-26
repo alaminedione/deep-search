@@ -39,7 +39,7 @@ const App = () => {
     
     if (storedHistory) {
       try {
-        const parsedHistory = JSON.parse(storedHistory).map((item: any) => ({
+        const parsedHistory = JSON.parse(storedHistory).map((item: SearchHistory) => ({
           ...item,
           timestamp: new Date(item.timestamp)
         }));

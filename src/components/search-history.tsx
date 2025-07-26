@@ -8,25 +8,14 @@ import { Checkbox } from "./ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { useToast } from "../hooks/use-toast";
-import { TSearchEngine } from "../types";
-
-interface SearchHistory {
-  id: string;
-  query: string;
-  timestamp: Date;
-  searchEngine: TSearchEngine;
-  isFavorite?: boolean;
-  tags?: string[];
-  category?: string;
-  notes?: string;
-}
+import { SearchHistory as SearchHistoryType } from "../types";
 
 interface EnhancedSearchHistoryProps {
-  searchHistory: SearchHistory[];
-  onLoadFromHistory: (historyItem: SearchHistory) => void;
+  searchHistory: SearchHistoryType[];
+  onLoadFromHistory: (historyItem: SearchHistoryType) => void;
   onClearHistory: () => void;
   onExportHistory: () => void;
-  onUpdateHistory: (updatedHistory: SearchHistory[]) => void;
+  onUpdateHistory: (updatedHistory: SearchHistoryType[]) => void;
 }
 
 const categories = [
@@ -57,7 +46,7 @@ export function SearchHistory({
 
   // Enhanced filtering and sorting
   const filteredAndSortedHistory = useMemo(() => {
-    let filtered = searchHistory.filter(item => {
+    const filtered = searchHistory.filter(item => {
       // Text filter
       const matchesText = !filterText || 
         item.query.toLowerCase().includes(filterText.toLowerCase()) ||
@@ -94,11 +83,12 @@ export function SearchHistory({
       switch (sortBy) {
         case "alphabetical":
           return a.query.localeCompare(b.query);
-        case "frequency":
+        case "frequency": {
           // Count occurrences of similar queries
           const aCount = searchHistory.filter(h => h.query === a.query).length;
           const bCount = searchHistory.filter(h => h.query === b.query).length;
           return bCount - aCount;
+        }
         case "date":
         default:
           return b.timestamp.getTime() - a.timestamp.getTime();
@@ -178,7 +168,7 @@ export function SearchHistory({
     });
   }, [toast]);
 
-  const openSearch = useCallback((item: SearchHistory) => {
+  const openSearch = useCallback((item: SearchHistoryType) => {
     const encodedQuery = encodeURIComponent(item.query);
     let searchUrl = '';
 
@@ -201,9 +191,10 @@ export function SearchHistory({
     reader.onload = (e) => {
       try {
         const importedHistory = JSON.parse(e.target?.result as string);
-        const validHistory = importedHistory.filter((item: any) => 
+        type ImportedItem = Partial<SearchHistoryType> & { id: string; query: string; timestamp: string };
+        const validHistory = importedHistory.filter((item: ImportedItem): item is ImportedItem => 
           item.id && item.query && item.timestamp
-        ).map((item: any) => ({
+        ).map((item: ImportedItem) => ({
           ...item,
           timestamp: new Date(item.timestamp),
           id: `imported-${item.id}-${Date.now()}` // Avoid ID conflicts
@@ -215,7 +206,7 @@ export function SearchHistory({
           title: "Historique importé",
           description: `${validHistory.length} éléments ont été importés avec succès.`,
         });
-      } catch (error) {
+      } catch {
         toast({
           title: "Erreur d'importation",
           description: "Le fichier n'est pas valide.",
@@ -335,7 +326,7 @@ export function SearchHistory({
 
               <div>
                 <Label htmlFor="sort-filter">Trier par</Label>
-                <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value as "date" | "frequency" | "alphabetical")}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -349,7 +340,7 @@ export function SearchHistory({
 
               <div>
                 <Label htmlFor="date-filter">Période</Label>
-                <Select value={dateRange} onValueChange={(value: any) => setDateRange(value)}>
+                <Select value={dateRange} onValueChange={(value) => setDateRange(value as "all" | "today" | "week" | "month")}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>

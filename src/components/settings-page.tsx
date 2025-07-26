@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
-import { useSettingApi } from "../contexts/settingApi";
+import { useSettingApi, AIModel } from "../contexts/settingApi";
 import { useTheme } from "./theme-provider";
 import { TSearchEngine } from "@/types";
 import {
@@ -25,7 +25,6 @@ import {
   Search,
   Palette,
   Key,
-  Globe,
   CheckCircle,
   AlertCircle,
   Trash2,
@@ -45,46 +44,52 @@ interface SettingsPageProps {
 }
 
 export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProps) {
-  const { 
-    apikey, 
-    endpoint, 
-    modele, 
-    configured, 
-    validateAndSaveConfig,
-    clearConfig
+  const {
+    openaiApiKey,
+    geminiApiKey,
+    claudeApiKey,
+    selectedModel,
+    configured,
+    saveConfig,
+    clearConfig,
+    setSelectedModel,
   } = useSettingApi();
-  
+
   const { theme, setTheme } = useTheme();
-  
+
   // États locaux pour les formulaires
-  const [localApikey, setLocalApikey] = useState(apikey);
-  const [localEndpoint, setLocalEndpoint] = useState(endpoint);
-  const [localModele, setLocalModele] = useState(modele);
-  const [isValidating, setIsValidating] = useState(false);
+  const [localOpenaiApiKey, setLocalOpenaiApiKey] = useState(openaiApiKey);
+  const [localGeminiApiKey, setLocalGeminiApiKey] = useState(geminiApiKey);
+  const [localClaudeApiKey, setLocalClaudeApiKey] = useState(claudeApiKey);
+  const [localSelectedModel, setLocalSelectedModel] = useState<AIModel>(selectedModel);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
+
   // Paramètres avancés
   const [autoSave, setAutoSave] = useState(true);
   const [debugMode, setDebugMode] = useState(false);
   const [cacheEnabled, setCacheEnabled] = useState(true);
 
   useEffect(() => {
-    setLocalApikey(apikey);
-    setLocalEndpoint(endpoint);
-    setLocalModele(modele);
-  }, [apikey, endpoint, modele]);
+    setLocalOpenaiApiKey(openaiApiKey);
+    setLocalGeminiApiKey(geminiApiKey);
+    setLocalClaudeApiKey(claudeApiKey);
+    setLocalSelectedModel(selectedModel);
+  }, [openaiApiKey, geminiApiKey, claudeApiKey, selectedModel]);
 
   useEffect(() => {
-    const hasChanges = localApikey !== apikey || localEndpoint !== endpoint || localModele !== modele;
+    const hasChanges = localOpenaiApiKey !== openaiApiKey ||
+      localGeminiApiKey !== geminiApiKey ||
+      localClaudeApiKey !== claudeApiKey ||
+      localSelectedModel !== selectedModel;
     setHasUnsavedChanges(hasChanges);
-  }, [localApikey, localEndpoint, localModele, apikey, endpoint, modele]);
+  }, [localOpenaiApiKey, localGeminiApiKey, localClaudeApiKey, localSelectedModel, openaiApiKey, geminiApiKey, claudeApiKey, selectedModel]);
 
   useEffect(() => {
     // Charger les paramètres avancés depuis localStorage
     const storedAutoSave = localStorage.getItem("deepSearch_autoSave");
     const storedDebugMode = localStorage.getItem("deepSearch_debugMode");
     const storedCacheEnabled = localStorage.getItem("deepSearch_cacheEnabled");
-    
+
     if (storedAutoSave) setAutoSave(storedAutoSave === "true");
     if (storedDebugMode) setDebugMode(storedDebugMode === "true");
     if (storedCacheEnabled) setCacheEnabled(storedCacheEnabled === "true");
@@ -127,48 +132,25 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
     });
   };
 
-  const handleSaveApiConfig = async () => {
-    if (!localApikey.trim() || !localEndpoint.trim() || !localModele.trim()) {
-      toast({
-        title: "Erreur de validation",
-        description: "Tous les champs sont obligatoires",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsValidating(true);
-    try {
-      const isValid = await validateAndSaveConfig(localApikey, localEndpoint, localModele);
-      
-      if (isValid) {
-        toast({
-          title: "Configuration sauvegardée",
-          description: "Votre configuration API a été validée et sauvegardée avec succès",
-        });
-      } else {
-        toast({
-          title: "Erreur de validation",
-          description: "Impossible de valider la configuration API. Vérifiez vos paramètres.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la validation",
-        variant: "destructive",
-      });
-    } finally {
-      setIsValidating(false);
-    }
+  const handleSaveApiConfig = () => {
+    saveConfig(localSelectedModel, {
+      openai: localOpenaiApiKey,
+      gemini: localGeminiApiKey,
+      claude: localClaudeApiKey,
+    });
+    setSelectedModel(localSelectedModel);
+    toast({
+      title: "Configuration sauvegardée",
+      description: "Votre configuration API a été sauvegardée avec succès",
+    });
   };
 
   const handleClearConfig = () => {
     clearConfig();
-    setLocalApikey("");
-    setLocalEndpoint("");
-    setLocalModele("");
+    setLocalOpenaiApiKey("");
+    setLocalGeminiApiKey("");
+    setLocalClaudeApiKey("");
+    setLocalSelectedModel('gemini');
     toast({
       title: "Configuration effacée",
       description: "Tous les paramètres API ont été supprimés",
@@ -176,9 +158,10 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
   };
 
   const handleResetToSaved = () => {
-    setLocalApikey(apikey);
-    setLocalEndpoint(endpoint);
-    setLocalModele(modele);
+    setLocalOpenaiApiKey(openaiApiKey);
+    setLocalGeminiApiKey(geminiApiKey);
+    setLocalClaudeApiKey(claudeApiKey);
+    setLocalSelectedModel(selectedModel);
     toast({
       title: "Modifications annulées",
       description: "Les valeurs ont été restaurées",
@@ -219,65 +202,79 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="endpoint" className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    Endpoint API
-                  </Label>
-                  <Input
-                    id="endpoint"
-                    value={localEndpoint}
-                    onChange={(e) => setLocalEndpoint(e.target.value)}
-                    placeholder="https://api.openai.com/v1/chat/completions"
-                    className="font-mono text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="modele" className="flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    Modèle
-                  </Label>
-                  <Input
-                    id="modele"
-                    value={localModele}
-                    onChange={(e) => setLocalModele(e.target.value)}
-                    placeholder="gpt-3.5-turbo"
-                    className="font-mono text-sm"
-                  />
-                </div>
-              </div>
               <div className="space-y-2">
-                <Label htmlFor="apikey" className="flex items-center gap-2">
+                <Label htmlFor="model" className="flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Modèle d'IA
+                </Label>
+                <Select value={localSelectedModel} onValueChange={(value) => setLocalSelectedModel(value as AIModel)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gemini">Gemini (Google)</SelectItem>
+                    <SelectItem value="openai">OpenAI</SelectItem>
+                    <SelectItem value="claude">Claude (Anthropic)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="openai-apikey" className="flex items-center gap-2">
                   <Key className="h-4 w-4" />
-                  Clé API
+                  Clé API OpenAI
                 </Label>
                 <Input
-                  id="apikey"
+                  id="openai-apikey"
                   type="password"
-                  value={localApikey}
-                  onChange={(e) => setLocalApikey(e.target.value)}
+                  value={localOpenaiApiKey}
+                  onChange={(e) => setLocalOpenaiApiKey(e.target.value)}
                   placeholder="sk-..."
                   className="font-mono text-sm"
+                  disabled={localSelectedModel !== 'openai'}
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gemini-apikey" className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  Clé API Gemini
+                </Label>
+                <Input
+                  id="gemini-apikey"
+                  type="password"
+                  value={localGeminiApiKey}
+                  onChange={(e) => setLocalGeminiApiKey(e.target.value)}
+                  placeholder="AIzaSy..."
+                  className="font-mono text-sm"
+                  disabled={localSelectedModel !== 'gemini'}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="claude-apikey" className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  Clé API Claude
+                </Label>
+                <Input
+                  id="claude-apikey"
+                  type="password"
+                  value={localClaudeApiKey}
+                  onChange={(e) => setLocalClaudeApiKey(e.target.value)}
+                  placeholder="..."
+                  className="font-mono text-sm"
+                  disabled={localSelectedModel !== 'claude'}
+                />
+              </div>
+
               <div className="flex gap-2 pt-2">
                 <Button 
                   onClick={handleSaveApiConfig} 
-                  disabled={isValidating || !hasUnsavedChanges}
+                  disabled={!hasUnsavedChanges}
                   className="flex-1"
                 >
-                  {isValidating ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Validation...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Sauvegarder et valider
-                    </>
-                  )}
+                  <Save className="h-4 w-4 mr-2" />
+                  Sauvegarder
                 </Button>
                 {hasUnsavedChanges && (
                   <Button variant="outline" onClick={handleResetToSaved}>

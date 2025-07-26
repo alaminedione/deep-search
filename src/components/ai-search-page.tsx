@@ -2,17 +2,18 @@ import { History } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
 import { AiTranslator } from "./ai-translator";
-import { SearchHistory } from "./search-history";
+import { SearchHistory as SearchHistoryComponent } from "./search-history";
 import { CollapsiblePanel } from "./collapsible-panel";
+import { SearchHistory } from "@/types";
 
 interface AiSearchPageProps {
   onSearch: (query: string) => void;
   
-  searchHistory: any[];
-  onLoadFromHistory: (historyItem: any) => void;
+  searchHistory: SearchHistory[];
+  onLoadFromHistory: (historyItem: SearchHistory) => void;
   onExportHistory: () => void;
   onClearHistory: () => void;
-    onUpdateHistory: (updatedHistory: any[]) => void;
+  onUpdateHistory: (updatedHistory: SearchHistory[]) => void;
   queryToLoad?: string;
 }
 
@@ -23,7 +24,7 @@ export function AiSearchPage({
   onLoadFromHistory,
   onExportHistory,
   onClearHistory,
-    onUpdateHistory,
+  onUpdateHistory,
   queryToLoad,
 }: AiSearchPageProps) {
   return (
@@ -56,7 +57,7 @@ export function AiSearchPage({
         <CardContent className="p-8 space-y-6">
           <AiTranslator onQueryGenerated={onSearch} initialQuery={queryToLoad} />
           <CollapsiblePanel title="Search History" icon={History}>
-            <SearchHistory
+            <SearchHistoryComponent
               searchHistory={searchHistory}
               onLoadFromHistory={onLoadFromHistory}
               onExportHistory={onExportHistory}

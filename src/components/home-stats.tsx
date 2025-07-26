@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from './ui/card';
 import { Search, Clock, Star, TrendingUp } from 'lucide-react';
+import { SearchHistory } from '@/types';
 
 interface HomeStatsProps {
-  searchHistory: any[];
+  searchHistory: SearchHistory[];
 }
 
 export const HomeStats = ({ searchHistory }: HomeStatsProps) => {
