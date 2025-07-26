@@ -15,7 +15,7 @@ interface AiTranslatorProps {
 
 export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslatorProps) {
   const { toast } = useToast();
-  const { openaiApiKey, geminiApiKey, claudeApiKey, selectedModel, configured } = useSettingApi();
+  const { provider, model, apiKey, configured } = useSettingApi();
   const [userInput, setUserInput] = useState(initialQuery || "");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [generatedQuery, setGeneratedQuery] = useState("");
@@ -35,8 +35,9 @@ export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslat
     try {
       const response = await getAICompletion(
         `Traduisez la demande suivante en une requête Google Dork : "${userInput}"`, 
-        selectedModel, 
-        { openai: openaiApiKey, gemini: geminiApiKey, claude: claudeApiKey }
+        provider, 
+        model,
+        apiKey
       );
       setGeneratedQuery(response.content);
       toast({
@@ -53,7 +54,7 @@ export function AiTranslator({ onQueryGenerated, initialQuery = "" }: AiTranslat
     } finally {
       setIsAnalyzing(false);
     }
-  }, [userInput, configured, selectedModel, openaiApiKey, geminiApiKey, claudeApiKey, toast]);
+  }, [userInput, configured, provider, model, apiKey, toast]);
 
   const applyQuery = useCallback(() => {
     onQueryGenerated(generatedQuery);

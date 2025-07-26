@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
-import { useSettingApi, AIModel } from "../contexts/settingApi";
+import { useSettingApi, AIProvider } from "../contexts/settingApi";
 import { useTheme } from "./theme-provider";
 import { TSearchEngine } from "@/types";
 import {
@@ -45,23 +45,20 @@ interface SettingsPageProps {
 
 export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProps) {
   const {
-    openaiApiKey,
-    geminiApiKey,
-    claudeApiKey,
-    selectedModel,
+    provider,
+    model,
+    apiKey,
     configured,
     saveConfig,
     clearConfig,
-    setSelectedModel,
   } = useSettingApi();
 
   const { theme, setTheme } = useTheme();
 
   // États locaux pour les formulaires
-  const [localOpenaiApiKey, setLocalOpenaiApiKey] = useState(openaiApiKey);
-  const [localGeminiApiKey, setLocalGeminiApiKey] = useState(geminiApiKey);
-  const [localClaudeApiKey, setLocalClaudeApiKey] = useState(claudeApiKey);
-  const [localSelectedModel, setLocalSelectedModel] = useState<AIModel>(selectedModel);
+  const [localProvider, setLocalProvider] = useState(provider);
+  const [localModel, setLocalModel] = useState(model);
+  const [localApiKey, setLocalApiKey] = useState(apiKey);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Paramètres avancés
@@ -70,19 +67,17 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
   const [cacheEnabled, setCacheEnabled] = useState(true);
 
   useEffect(() => {
-    setLocalOpenaiApiKey(openaiApiKey);
-    setLocalGeminiApiKey(geminiApiKey);
-    setLocalClaudeApiKey(claudeApiKey);
-    setLocalSelectedModel(selectedModel);
-  }, [openaiApiKey, geminiApiKey, claudeApiKey, selectedModel]);
+    setLocalProvider(provider);
+    setLocalModel(model);
+    setLocalApiKey(apiKey);
+  }, [provider, model, apiKey]);
 
   useEffect(() => {
-    const hasChanges = localOpenaiApiKey !== openaiApiKey ||
-      localGeminiApiKey !== geminiApiKey ||
-      localClaudeApiKey !== claudeApiKey ||
-      localSelectedModel !== selectedModel;
+    const hasChanges = localProvider !== provider ||
+      localModel !== model ||
+      localApiKey !== apiKey;
     setHasUnsavedChanges(hasChanges);
-  }, [localOpenaiApiKey, localGeminiApiKey, localClaudeApiKey, localSelectedModel, openaiApiKey, geminiApiKey, claudeApiKey, selectedModel]);
+  }, [localProvider, localModel, localApiKey, provider, model, apiKey]);
 
   useEffect(() => {
     // Charger les paramètres avancés depuis localStorage
@@ -133,12 +128,7 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
   };
 
   const handleSaveApiConfig = () => {
-    saveConfig(localSelectedModel, {
-      openai: localOpenaiApiKey,
-      gemini: localGeminiApiKey,
-      claude: localClaudeApiKey,
-    });
-    setSelectedModel(localSelectedModel);
+    saveConfig(localProvider, localModel, localApiKey);
     toast({
       title: "Configuration sauvegardée",
       description: "Votre configuration API a été sauvegardée avec succès",
@@ -147,10 +137,9 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
 
   const handleClearConfig = () => {
     clearConfig();
-    setLocalOpenaiApiKey("");
-    setLocalGeminiApiKey("");
-    setLocalClaudeApiKey("");
-    setLocalSelectedModel('gemini');
+    setLocalProvider('gemini');
+    setLocalModel('gemini-1.5-flash');
+    setLocalApiKey('');
     toast({
       title: "Configuration effacée",
       description: "Tous les paramètres API ont été supprimés",
@@ -158,10 +147,9 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
   };
 
   const handleResetToSaved = () => {
-    setLocalOpenaiApiKey(openaiApiKey);
-    setLocalGeminiApiKey(geminiApiKey);
-    setLocalClaudeApiKey(claudeApiKey);
-    setLocalSelectedModel(selectedModel);
+    setLocalProvider(provider);
+    setLocalModel(model);
+    setLocalApiKey(apiKey);
     toast({
       title: "Modifications annulées",
       description: "Les valeurs ont été restaurées",
@@ -203,11 +191,11 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="model" className="flex items-center gap-2">
+                <Label htmlFor="provider" className="flex items-center gap-2">
                   <Zap className="h-4 w-4" />
-                  Modèle d'IA
+                  Fournisseur d'IA
                 </Label>
-                <Select value={localSelectedModel} onValueChange={(value) => setLocalSelectedModel(value as AIModel)}>
+                <Select value={localProvider} onValueChange={(value) => setLocalProvider(value as AIProvider)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -215,55 +203,38 @@ export function SettingsPage({ searchEngine, setSearchEngine }: SettingsPageProp
                     <SelectItem value="gemini">Gemini (Google)</SelectItem>
                     <SelectItem value="openai">OpenAI</SelectItem>
                     <SelectItem value="claude">Claude (Anthropic)</SelectItem>
+                    <SelectItem value="custom">Personnalisé</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="openai-apikey" className="flex items-center gap-2">
-                  <Key className="h-4 w-4" />
-                  Clé API OpenAI
+                <Label htmlFor="model" className="flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Nom du modèle
                 </Label>
                 <Input
-                  id="openai-apikey"
-                  type="password"
-                  value={localOpenaiApiKey}
-                  onChange={(e) => setLocalOpenaiApiKey(e.target.value)}
-                  placeholder="sk-..."
+                  id="model"
+                  type="text"
+                  value={localModel}
+                  onChange={(e) => setLocalModel(e.target.value)}
+                  placeholder="gemini-1.5-flash"
                   className="font-mono text-sm"
-                  disabled={localSelectedModel !== 'openai'}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="gemini-apikey" className="flex items-center gap-2">
+                <Label htmlFor="api-key" className="flex items-center gap-2">
                   <Key className="h-4 w-4" />
-                  Clé API Gemini
+                  Clé API
                 </Label>
                 <Input
-                  id="gemini-apikey"
+                  id="api-key"
                   type="password"
-                  value={localGeminiApiKey}
-                  onChange={(e) => setLocalGeminiApiKey(e.target.value)}
-                  placeholder="AIzaSy..."
+                  value={localApiKey}
+                  onChange={(e) => setLocalApiKey(e.target.value)}
+                  placeholder="sk-... ou AIzaSy..."
                   className="font-mono text-sm"
-                  disabled={localSelectedModel !== 'gemini'}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="claude-apikey" className="flex items-center gap-2">
-                  <Key className="h-4 w-4" />
-                  Clé API Claude
-                </Label>
-                <Input
-                  id="claude-apikey"
-                  type="password"
-                  value={localClaudeApiKey}
-                  onChange={(e) => setLocalClaudeApiKey(e.target.value)}
-                  placeholder="..."
-                  className="font-mono text-sm"
-                  disabled={localSelectedModel !== 'claude'}
                 />
               </div>
 

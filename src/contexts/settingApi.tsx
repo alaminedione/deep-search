@@ -1,20 +1,18 @@
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
-export type AIModel = 'gemini' | 'openai' | 'claude';
+export type AIProvider = 'gemini' | 'openai' | 'claude' | 'custom';
 
 // Définition de l'interface pour les props du contexte
 export interface PropsSettingApi {
-  openaiApiKey: string;
-  setOpenaiApiKey: React.Dispatch<React.SetStateAction<string>>;
-  geminiApiKey: string;
-  setGeminiApiKey: React.Dispatch<React.SetStateAction<string>>;
-  claudeApiKey: string;
-  setClaudeApiKey: React.Dispatch<React.SetStateAction<string>>;
-  selectedModel: AIModel;
-  setSelectedModel: React.Dispatch<React.SetStateAction<AIModel>>;
+  provider: AIProvider;
+  setProvider: React.Dispatch<React.SetStateAction<AIProvider>>;
+  model: string;
+  setModel: React.Dispatch<React.SetStateAction<string>>;
+  apiKey: string;
+  setApiKey: React.Dispatch<React.SetStateAction<string>>;
   configured: boolean;
   setConfigured: React.Dispatch<React.SetStateAction<boolean>>;
-  saveConfig: (model: AIModel, keys: { openai?: string; gemini?: string; claude?: string }) => void;
+  saveConfig: (provider: AIProvider, model: string, apiKey: string) => void;
   clearConfig: () => void;
   isValidConfig: boolean;
 }
@@ -28,26 +26,23 @@ const SettingApiContext = createContext<PropsSettingApi | undefined>(undefined);
 
 // Composant Provider
 export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
-  const [openaiApiKey, setOpenaiApiKey] = useState('');
-  const [geminiApiKey, setGeminiApiKey] = useState('');
-  const [claudeApiKey, setClaudeApiKey] = useState('');
-  const [selectedModel, setSelectedModel] = useState<AIModel>('gemini');
+  const [provider, setProvider] = useState<AIProvider>('gemini');
+  const [model, setModel] = useState('gemini-1.5-flash'); // Default to a working Gemini model
+  const [apiKey, setApiKey] = useState('');
   const [configured, setConfigured] = useState(false);
 
   // Load configuration from localStorage on mount
   useEffect(() => {
     const loadConfig = () => {
       try {
-        const storedOpenaiKey = localStorage.getItem('deepSearch_openaiApiKey');
-        const storedGeminiKey = localStorage.getItem('deepSearch_geminiApiKey');
-        const storedClaudeKey = localStorage.getItem('deepSearch_claudeApiKey');
-        const storedModel = localStorage.getItem('deepSearch_selectedModel') as AIModel;
+        const storedProvider = localStorage.getItem('deepSearch_provider') as AIProvider;
+        const storedModel = localStorage.getItem('deepSearch_model');
+        const storedApiKey = localStorage.getItem('deepSearch_apiKey');
         const storedConfigured = localStorage.getItem('deepSearch_configured');
 
-        if (storedOpenaiKey) setOpenaiApiKey(storedOpenaiKey);
-        if (storedGeminiKey) setGeminiApiKey(storedGeminiKey);
-        if (storedClaudeKey) setClaudeApiKey(storedClaudeKey);
-        if (storedModel) setSelectedModel(storedModel);
+        if (storedProvider) setProvider(storedProvider);
+        if (storedModel) setModel(storedModel);
+        if (storedApiKey) setApiKey(storedApiKey);
         if (storedConfigured === 'true') setConfigured(true);
       } catch (error) {
         console.error('Error loading API configuration:', error);
@@ -59,60 +54,45 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
 
   // Save configuration to localStorage whenever it changes
   useEffect(() => {
-    if (openaiApiKey) localStorage.setItem('deepSearch_openaiApiKey', openaiApiKey);
-    if (geminiApiKey) localStorage.setItem('deepSearch_geminiApiKey', geminiApiKey);
-    if (claudeApiKey) localStorage.setItem('deepSearch_claudeApiKey', claudeApiKey);
-    localStorage.setItem('deepSearch_selectedModel', selectedModel);
+    localStorage.setItem('deepSearch_provider', provider);
+    localStorage.setItem('deepSearch_model', model);
+    localStorage.setItem('deepSearch_apiKey', apiKey);
     localStorage.setItem('deepSearch_configured', configured.toString());
-  }, [openaiApiKey, geminiApiKey, claudeApiKey, selectedModel, configured]);
+  }, [provider, model, apiKey, configured]);
 
   // Check if current configuration is valid
-  const isValidConfig = configured &&
-    (selectedModel === 'openai' ? !!openaiApiKey :
-     selectedModel === 'gemini' ? !!geminiApiKey :
-     selectedModel === 'claude' ? !!claudeApiKey : false);
+  const isValidConfig = configured && !!apiKey && !!model;
 
   // Save configuration
-  const saveConfig = useCallback((model: AIModel, keys: { openai?: string; gemini?: string; claude?: string }) => {
-    setSelectedModel(model);
-    if (keys.openai) setOpenaiApiKey(keys.openai);
-    if (keys.gemini) setGeminiApiKey(keys.gemini);
-    if (keys.claude) setClaudeApiKey(keys.claude);
-    
-    const isConfigured = 
-      (model === 'openai' && !!keys.openai) ||
-      (model === 'gemini' && !!keys.gemini) ||
-      (model === 'claude' && !!keys.claude);
-      
-    setConfigured(isConfigured);
+  const saveConfig = useCallback((newProvider: AIProvider, newModel: string, newApiKey: string) => {
+    setProvider(newProvider);
+    setModel(newModel);
+    setApiKey(newApiKey);
+    setConfigured(!!newApiKey && !!newModel);
   }, []);
 
   // Clear all configuration
   const clearConfig = useCallback(() => {
-    setOpenaiApiKey('');
-    setGeminiApiKey('');
-    setClaudeApiKey('');
-    setSelectedModel('gemini');
+    setProvider('gemini');
+    setModel('gemini-1.5-flash');
+    setApiKey('');
     setConfigured(false);
     
     // Clear from localStorage
-    localStorage.removeItem('deepSearch_openaiApiKey');
-    localStorage.removeItem('deepSearch_geminiApiKey');
-    localStorage.removeItem('deepSearch_claudeApiKey');
-    localStorage.removeItem('deepSearch_selectedModel');
+    localStorage.removeItem('deepSearch_provider');
+    localStorage.removeItem('deepSearch_model');
+    localStorage.removeItem('deepSearch_apiKey');
     localStorage.removeItem('deepSearch_configured');
   }, []);
 
   // Création de l'objet settingsApi
   const settingsApi: PropsSettingApi = {
-    openaiApiKey,
-    setOpenaiApiKey,
-    geminiApiKey,
-    setGeminiApiKey,
-    claudeApiKey,
-    setClaudeApiKey,
-    selectedModel,
-    setSelectedModel,
+    provider,
+    setProvider,
+    model,
+    setModel,
+    apiKey,
+    setApiKey,
     configured,
     setConfigured,
     saveConfig,

@@ -65,7 +65,10 @@ export function SearchHistory({
       const now = new Date();
       let matchesDate = true;
       
-      if (dateRange === "today") {
+      // Ensure timestamp is a valid Date object
+      if (!(item.timestamp instanceof Date) || isNaN(item.timestamp.getTime())) {
+        matchesDate = false;
+      } else if (dateRange === "today") {
         matchesDate = item.timestamp.toDateString() === now.toDateString();
       } else if (dateRange === "week") {
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -192,13 +195,14 @@ export function SearchHistory({
       try {
         const importedHistory = JSON.parse(e.target?.result as string);
         type ImportedItem = Partial<SearchHistoryType> & { id: string; query: string; timestamp: string };
-        const validHistory = importedHistory.filter((item: ImportedItem): item is ImportedItem => 
-          item.id && item.query && item.timestamp
-        ).map((item: ImportedItem) => ({
-          ...item,
-          timestamp: new Date(item.timestamp),
-          id: `imported-${item.id}-${Date.now()}` // Avoid ID conflicts
-        }));
+        const validHistory = importedHistory.map((item: ImportedItem) => {
+          const timestamp = new Date(item.timestamp);
+          return {
+            ...item,
+            timestamp: isNaN(timestamp.getTime()) ? new Date() : timestamp, // Use current date if invalid
+            id: `imported-${item.id}-${Date.now()}` // Avoid ID conflicts
+          };
+        }).filter((item: SearchHistoryType) => item.id && item.query); // Filter out items with missing id or query
 
         onUpdateHistory([...searchHistory, ...validHistory]);
         
@@ -358,7 +362,7 @@ export function SearchHistory({
                   <Checkbox
                     id="favorites-only"
                     checked={showFavoritesOnly}
-                    onCheckedChange={(checked) => setShowFavoritesOnly(checked === true)}
+                    onCheckedChange={(checked) => setShowFavoritesOnly(!!checked)}
                   />
                   <Label htmlFor="favorites-only" className="text-sm">Favoris</Label>
                 </div>
