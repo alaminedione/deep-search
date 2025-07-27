@@ -8,6 +8,9 @@ import { SettingsPage } from '@/components/settings-page';
 import { AiSearchPage } from './components/ai-search-page';
 import { HomeStats } from "./components/home-stats";
 import { HeroSection } from "./components/hero-section";
+import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
+import { Menu } from 'lucide-react';
+import { useMediaQuery } from './hooks/use-media-query';
 
 const App = () => {
   const { toast } = useToast();
@@ -80,8 +83,27 @@ const App = () => {
     }
   }, [searchEngine, toast]);
 
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
-
+  const navLinks = (
+    <>
+      <Button 
+        variant={currentView === 'home' ? 'default' : 'ghost'}
+        onClick={() => setCurrentView('home')}
+        className="font-medium"
+      >
+        Accueil
+      </Button>
+      <Button 
+        variant={currentView === 'search' ? 'default' : 'ghost'}
+        onClick={() => setCurrentView('search')}
+        className="font-medium"
+      >
+        Recherche
+      </Button>
+      <SettingsPage searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
+    </>
+  );
 
   return (
     <SettingApiProvider>
@@ -94,23 +116,24 @@ const App = () => {
                   style={{ fontFamily: "JetBrains Mono" }}>
                 Deep Search
               </h1>
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant={currentView === 'home' ? 'default' : 'ghost'}
-                  onClick={() => setCurrentView('home')}
-                  className="font-medium"
-                >
-                  Accueil
-                </Button>
-                <Button 
-                  variant={currentView === 'search' ? 'default' : 'ghost'}
-                  onClick={() => setCurrentView('search')}
-                  className="font-medium"
-                >
-                  Recherche
-                </Button>
-                <SettingsPage searchEngine={searchEngine} setSearchEngine={setSearchEngine} />
-              </div>
+              {isDesktop ? (
+                <div className="flex items-center gap-3">
+                  {navLinks}
+                </div>
+              ) : (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-6 w-6" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <div className="flex flex-col gap-4 py-6">
+                      {navLinks}
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              )}
             </div>
           </div>
         </nav>
