@@ -12,19 +12,19 @@ interface HeroSectionProps {
 
 export function HeroSection({ onStartSearch }: HeroSectionProps) {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-12 md:py-20 lg:py-24">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="max-w-4xl mx-auto text-center"
+        className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8"
       >
         {/* Hero Badge */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200/20 dark:border-blue-800/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-full text-sm font-medium mb-8"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200/20 dark:border-blue-800/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-full text-sm font-medium mb-6 md:mb-8"
         >
           <Sparkles className="h-4 w-4" />
           Recherche avancée nouvelle génération
@@ -32,7 +32,7 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
 
         {/* Main Heading */}
         <motion.h1 
-          className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent leading-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent leading-tight"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
@@ -43,7 +43,7 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
 
         {/* Subtitle */}
         <motion.p 
-          className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed"
+          className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -60,12 +60,12 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mb-16"
+          className="mb-12 md:mb-16"
         >
           <Button 
             size="lg" 
             onClick={onStartSearch}
-            className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
+            className="w-full sm:w-auto px-8 py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
           >
             <Search className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
             Commencer à rechercher
@@ -78,7 +78,7 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-wrap justify-center gap-3"
+          className="flex flex-wrap justify-center gap-3 md:gap-4"
         >
           {[
             "Opérateurs avancés",

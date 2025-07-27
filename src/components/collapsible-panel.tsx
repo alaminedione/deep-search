@@ -16,11 +16,11 @@ export function CollapsiblePanel({ title, icon: Icon, children, isOpen: defaultO
     <div className="border rounded-lg bg-card">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 font-semibold text-lg"
+        className="w-full flex items-center justify-between p-4 font-semibold text-md sm:text-lg"
       >
         <div className="flex items-center gap-2">
           <Icon className="h-5 w-5" />
-          <span>{title}</span>
+          <span className="text-left">{title}</span>
         </div>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}

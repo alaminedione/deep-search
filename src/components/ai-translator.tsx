@@ -66,17 +66,17 @@ export function AiTranslator({ onQueryGenerated }: AiTranslatorProps) {
   }, [generatedQuery, toast]);
 
   return (
-    <div className="space-y-6 p-6 border rounded-xl bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
-      <div className="text-center space-y-3">
-        <div className="flex items-center justify-center gap-3">
+    <div className="space-y-6 p-4 sm:p-6 border rounded-xl bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
+      <div className="text-center space-y-2">
+        <div className="flex items-center justify-center gap-2 sm:gap-3">
           <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-            <Brain className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Traducteur de Dork Google par IA
           </h3>
         </div>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Demandez en anglais simple, et l'IA le traduira en une requête Google Dork avancée.
         </p>
       </div>
@@ -86,18 +86,18 @@ export function AiTranslator({ onQueryGenerated }: AiTranslatorProps) {
           <Label htmlFor="ai-input" className="text-base font-medium">
             Votre demande
           </Label>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Input
               id="ai-input"
               placeholder="ex: Je veux des cours gratuits pour débutants..."
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
-              className="h-12 text-base"
+              className="h-12 text-base flex-grow"
             />
             <Button
               onClick={generateDork}
               disabled={!userInput.trim() || isAnalyzing || !configured}
-              className="h-12 px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+              className="h-12 px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 w-full sm:w-auto"
               size="lg"
             >
               {isAnalyzing ? (
@@ -129,7 +129,7 @@ export function AiTranslator({ onQueryGenerated }: AiTranslatorProps) {
               className="text-sm font-mono resize-none border-0 bg-transparent p-0"
               rows={2}
             />
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button onClick={applyQuery} className="w-full">
                 <Search className="h-4 w-4 mr-2" />
                 Appliquer la requête

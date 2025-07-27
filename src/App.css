@@ -5,3 +5,15 @@
   gap: 1.5rem;
   height: 100svh;
 }
+
+@media (max-width: 768px) {
+  #root {
+    margin: 0 5%;
+  }
+}
+
+@media (max-width: 480px) {
+  #root {
+    margin: 0 2.5%;
+  }
+}

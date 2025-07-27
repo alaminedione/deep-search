@@ -63,12 +63,12 @@ export const HomeStats = ({ searchTimestamps }: HomeStatsProps) => {
   ];
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
       >
         {statCards.map((stat, index) => (
           <motion.div
@@ -78,23 +78,23 @@ export const HomeStats = ({ searchTimestamps }: HomeStatsProps) => {
             transition={{ delay: index * 0.1, duration: 0.5 }}
           >
             <Card className="relative overflow-hidden border-0 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm hover:bg-white/70 dark:hover:bg-gray-900/70 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
-                    <stat.icon className="h-6 w-6 text-white" />
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <div className={`p-2 sm:p-3 rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
+                    <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                     {stat.value}
                   </div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
                     {stat.title}
                   </p>
                 </div>
                 
                 {/* Decorative gradient overlay */}
-                <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${stat.gradient} opacity-5 rounded-full -translate-y-10 translate-x-10`} />
+                <div className={`absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${stat.gradient} opacity-5 rounded-full -translate-y-8 -translate-x-8 sm:-translate-y-10 sm:translate-x-10`} />
               </CardContent>
             </Card>
           </motion.div>
