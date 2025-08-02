@@ -1,36 +1,45 @@
-import { createContext, useState, useContext, useEffect, useCallback, useMemo } from 'react';
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 
-
-export type AIProvider = 'gemini' | 'openai' | 'claude' | 'custom';
+export type AIProvider = "gemini" | "openai" | "claude" | "custom";
 
 // Map des modèles supportés par provider (pour validation)
 const SUPPORTED_MODELS: Record<AIProvider, string[]> = {
-  gemini: ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro', 'gemini-2.5-flash', 'gemini-2.5-pro'],
-  openai: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo'],
-  claude: ['claude-2', 'claude-3-sonnet', 'claude-3-opus', 'claude-sonnet-4'],
+  gemini: [
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-1.0-pro",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+  ],
+  openai: ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo"],
+  claude: ["claude-2", "claude-3-sonnet", "claude-3-opus", "claude-sonnet-4"],
   custom: [], // Pour 'custom', on accepte tout modèle non vide
 };
 
 // Modèles par défaut par provider
 const DEFAULT_MODELS: Record<AIProvider, string> = {
-  gemini: 'gemini-2.5-flash',
-  openai: 'gpt-3.5-turbo',
-  claude: 'claude-3-sonnet',
-  custom: '',
+  gemini: "gemini-2.5-flash",
+  openai: "gpt-3.5-turbo",
+  claude: "claude-3-sonnet",
+  custom: "",
 };
 
 // Génération d'une clé de 32 bytes exactement pour AES-256
 function generateEncryptionKey(): Promise<CryptoKey> {
-  const keyString = 'your-secret-key-here-must-be-32b'; // Exactement 32 caractères = 32 bytes
+  const keyString = "your-secret-key-here-must-be-32b"; // Exactement 32 caractères = 32 bytes
   const keyData = new TextEncoder().encode(keyString);
 
-  return crypto.subtle.importKey(
-    'raw',
-    keyData,
-    { name: 'AES-GCM' },
-    false,
-    ['encrypt', 'decrypt']
-  );
+  return crypto.subtle.importKey("raw", keyData, { name: "AES-GCM" }, false, [
+    "encrypt",
+    "decrypt",
+  ]);
 }
 
 // Cache pour la clé de chiffrement
@@ -51,9 +60,9 @@ async function encryptApiKey(key: string): Promise<string> {
     const cryptoKey = await getEncryptionKey();
 
     const encrypted = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv },
+      { name: "AES-GCM", iv },
       cryptoKey,
-      encoded
+      encoded,
     );
 
     // Combine IV and encrypted data, then encode to base64
@@ -63,15 +72,17 @@ async function encryptApiKey(key: string): Promise<string> {
 
     return btoa(String.fromCharCode(...combined));
   } catch (error) {
-    console.error('Encryption error:', error);
-    throw new Error('Failed to encrypt API key');
+    console.error("Encryption error:", error);
+    throw new Error("Failed to encrypt API key");
   }
 }
 
 async function decryptApiKey(encrypted: string): Promise<string> {
   try {
     const combined = new Uint8Array(
-      atob(encrypted).split('').map(char => char.charCodeAt(0))
+      atob(encrypted)
+        .split("")
+        .map((char) => char.charCodeAt(0)),
     );
 
     const iv = combined.slice(0, 12);
@@ -79,15 +90,15 @@ async function decryptApiKey(encrypted: string): Promise<string> {
     const cryptoKey = await getEncryptionKey();
 
     const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
+      { name: "AES-GCM", iv },
       cryptoKey,
-      data
+      data,
     );
 
     return new TextDecoder().decode(decrypted);
-  } catch (error) {
-    console.error('Decryption error:', error);
-    throw new Error('Failed to decrypt API key');
+  } catch (decryptError) {
+    console.error("Decryption error:", decryptError);
+    throw new Error("Failed to decrypt API key");
   }
 }
 
@@ -101,7 +112,11 @@ export interface PropsSettingApi {
   setApiKey: React.Dispatch<React.SetStateAction<string>>;
   configured: boolean;
   isLoading: boolean;
-  saveConfig: (provider: AIProvider, model: string, apiKey: string) => Promise<void>;
+  saveConfig: (
+    provider: AIProvider,
+    model: string,
+    apiKey: string,
+  ) => Promise<void>;
   clearConfig: () => void;
   isValidConfig: boolean;
   validateModel: (provider: AIProvider, model: string) => boolean;
@@ -116,17 +131,20 @@ const SettingApiContext = createContext<PropsSettingApi | undefined>(undefined);
 
 // Composant Provider
 export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
-  const [provider, setProvider] = useState<AIProvider>('gemini');
+  const [provider, setProvider] = useState<AIProvider>("gemini");
   const [model, setModel] = useState<string>(DEFAULT_MODELS.gemini);
-  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>("");
   const [configured, setConfigured] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Validation d'un modèle pour un provider
-  const validateModel = useCallback((prov: AIProvider, mod: string): boolean => {
-    if (prov === 'custom') return !!mod; // Accepte tout non vide pour custom
-    return SUPPORTED_MODELS[prov].includes(mod);
-  }, []);
+  const validateModel = useCallback(
+    (prov: AIProvider, mod: string): boolean => {
+      if (prov === "custom") return !!mod; // Accepte tout non vide pour custom
+      return SUPPORTED_MODELS[prov].includes(mod);
+    },
+    [],
+  );
 
   // isValidConfig comme valeur dérivée (avec useMemo pour perf)
   const isValidConfig = useMemo(() => {
@@ -147,10 +165,13 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const storedProvider = localStorage.getItem('deepSearch_provider') as AIProvider | null;
-        const storedModel = localStorage.getItem('deepSearch_model');
-        const storedEncryptedApiKey = localStorage.getItem('deepSearch_apiKey');
-        const storedConfigured = localStorage.getItem('deepSearch_configured') === 'true';
+        const storedProvider = localStorage.getItem(
+          "deepSearch_provider",
+        ) as AIProvider | null;
+        const storedModel = localStorage.getItem("deepSearch_model");
+        const storedEncryptedApiKey = localStorage.getItem("deepSearch_apiKey");
+        const storedConfigured =
+          localStorage.getItem("deepSearch_configured") === "true";
 
         if (storedProvider) setProvider(storedProvider);
         if (storedModel) setModel(storedModel);
@@ -159,15 +180,20 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
             const decrypted = await decryptApiKey(storedEncryptedApiKey);
             setApiKey(decrypted);
           } catch (decryptError) {
-            console.warn('Failed to decrypt stored API key, clearing storage');
-            localStorage.removeItem('deepSearch_apiKey');
+            console.warn(
+              "Failed to decrypt stored API key, clearing storage:",
+              decryptError,
+            );
+            localStorage.removeItem("deepSearch_apiKey");
           }
         }
         setConfigured(storedConfigured);
 
-        console.warn('API key loaded from localStorage. Note: This is not secure for production use!');
+        console.warn(
+          "API key loaded from localStorage. Note: This is not secure for production use!",
+        );
       } catch (error) {
-        console.error('Error loading API configuration:', error);
+        console.error("Error loading API configuration:", error);
         clearConfig(); // Reset en cas d'erreur
       } finally {
         setIsLoading(false);
@@ -181,24 +207,24 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
   useEffect(() => {
     const saveToStorage = async () => {
       try {
-        localStorage.setItem('deepSearch_provider', provider);
-        localStorage.setItem('deepSearch_model', model);
+        localStorage.setItem("deepSearch_provider", provider);
+        localStorage.setItem("deepSearch_model", model);
         if (apiKey) {
           try {
             const encrypted = await encryptApiKey(apiKey);
-            localStorage.setItem('deepSearch_apiKey', encrypted);
+            localStorage.setItem("deepSearch_apiKey", encrypted);
           } catch (encryptError) {
-            console.error('Failed to encrypt API key:', encryptError);
+            console.error("Failed to encrypt API key:", encryptError);
             // Fallback: store unencrypted (not recommended for production)
-            localStorage.setItem('deepSearch_apiKey_fallback', apiKey);
+            localStorage.setItem("deepSearch_apiKey_fallback", apiKey);
           }
         } else {
-          localStorage.removeItem('deepSearch_apiKey');
-          localStorage.removeItem('deepSearch_apiKey_fallback');
+          localStorage.removeItem("deepSearch_apiKey");
+          localStorage.removeItem("deepSearch_apiKey_fallback");
         }
-        localStorage.setItem('deepSearch_configured', configured.toString());
+        localStorage.setItem("deepSearch_configured", configured.toString());
       } catch (error) {
-        console.error('Error saving API configuration:', error);
+        console.error("Error saving API configuration:", error);
       }
     };
 
@@ -206,29 +232,34 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
   }, [provider, model, apiKey, configured, isLoading]);
 
   // Sauvegarde de la config (async pour chiffrement)
-  const saveConfig = useCallback(async (newProvider: AIProvider, newModel: string, newApiKey: string) => {
-    if (!validateModel(newProvider, newModel)) {
-      throw new Error(`Invalid model "${newModel}" for provider "${newProvider}"`);
-    }
-    setProvider(newProvider);
-    setModel(newModel);
-    setApiKey(newApiKey);
-    // 'configured' sera mis à jour via useEffect
-  }, [validateModel]);
+  const saveConfig = useCallback(
+    async (newProvider: AIProvider, newModel: string, newApiKey: string) => {
+      if (!validateModel(newProvider, newModel)) {
+        throw new Error(
+          `Invalid model "${newModel}" for provider "${newProvider}"`,
+        );
+      }
+      setProvider(newProvider);
+      setModel(newModel);
+      setApiKey(newApiKey);
+      // 'configured' sera mis à jour via useEffect
+    },
+    [validateModel],
+  );
 
   // Reset de la config
   const clearConfig = useCallback(() => {
-    setProvider('gemini');
+    setProvider("gemini");
     setModel(DEFAULT_MODELS.gemini);
-    setApiKey('');
+    setApiKey("");
     setConfigured(false);
 
     // Clear localStorage
-    localStorage.removeItem('deepSearch_provider');
-    localStorage.removeItem('deepSearch_model');
-    localStorage.removeItem('deepSearch_apiKey');
-    localStorage.removeItem('deepSearch_apiKey_fallback');
-    localStorage.removeItem('deepSearch_configured');
+    localStorage.removeItem("deepSearch_provider");
+    localStorage.removeItem("deepSearch_model");
+    localStorage.removeItem("deepSearch_apiKey");
+    localStorage.removeItem("deepSearch_apiKey_fallback");
+    localStorage.removeItem("deepSearch_configured");
   }, []);
 
   // Objet du contexte
@@ -257,7 +288,7 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
 export const useSettingApi = () => {
   const context = useContext(SettingApiContext);
   if (!context) {
-    throw new Error('useSettingApi must be used within a SettingApiProvider');
+    throw new Error("useSettingApi must be used within a SettingApiProvider");
   }
   return context;
 };
