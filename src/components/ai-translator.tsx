@@ -78,8 +78,8 @@ export function AiTranslator({ onQueryGenerated }: AiTranslatorProps) {
           </h3>
         </div>
         <p className="text-xs sm:text-sm lg:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed text-balance">
-          Décrivez votre recherche en français simple, l'IA créera
-          automatiquement une requête Google Dork optimisée.
+          Décrivez ce que vous cherchez en langage naturel, et laissez l'IA
+          créer des recherches Google optimisées pour vous.
         </p>
       </div>
 

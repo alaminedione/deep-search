@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { 
-  Search, 
+import {
+  Search,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Github
 } from "lucide-react";
 
 interface HeroSectionProps {
@@ -31,7 +32,7 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
         </motion.div>
 
         {/* Main Heading */}
-        <motion.h1 
+        <motion.h1
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent leading-tight"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -42,7 +43,7 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
         </motion.h1>
 
         {/* Subtitle */}
-        <motion.p 
+        <motion.p
           className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -60,10 +61,10 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mb-12 md:mb-16"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 md:mb-16"
         >
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             onClick={onStartSearch}
             className="w-full sm:w-auto px-8 py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
           >
@@ -71,6 +72,16 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
             Commencer à rechercher
             <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
+          <a
+            href="https://github.com/alaminedione/deep-search"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 sm:mt-0 sm:ml-4 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
+          >
+            <Github className="h-5 w-5 mr-2" />
+            GitHub
+          </a>
+
         </motion.div>
 
         {/* Feature Pills */}
@@ -82,7 +93,7 @@ export function HeroSection({ onStartSearch }: HeroSectionProps) {
         >
           {[
             "Opérateurs avancés",
-            "IA intégrée", 
+            "IA intégrée",
             "Interface moderne",
             "Historique intelligent"
           ].map((feature, index) => (

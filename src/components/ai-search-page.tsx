@@ -29,15 +29,15 @@ export function AiSearchPage({ onSearch, onOpenSettings }: AiSearchPageProps) {
         >
           Recherche IA Avancée
         </motion.h2>
-        <motion.p
-          className="text-muted-foreground max-w-3xl mx-auto text-responsive-xl leading-relaxed text-balance"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          Décrivez ce que vous cherchez en langage naturel, et laissez l'IA
-          créer des recherches Google optimisées pour vous.
-        </motion.p>
+        {/* <motion.p */}
+        {/*   className="text-muted-foreground max-w-3xl mx-auto text-responsive-xl leading-relaxed text-balance" */}
+        {/*   initial={{ opacity: 0 }} */}
+        {/*   animate={{ opacity: 1 }} */}
+        {/*   transition={{ delay: 0.2 }} */}
+        {/* > */}
+        {/* Décrivez ce que vous cherchez en langage naturel, et laissez l'IA */}
+        {/* créer des recherches Google optimisées pour vous. */}
+        {/* </motion.p> */}
 
         {/* Feature badges */}
         <motion.div
@@ -70,11 +70,10 @@ export function AiSearchPage({ onSearch, onOpenSettings }: AiSearchPageProps) {
         <Card
           className={`
           border-0 shadow-2xl hover-lift transition-all duration-500
-          ${
-            configured
+          ${configured
               ? "bg-gradient-to-br from-white/95 via-emerald-50/50 to-blue-50/30 dark:from-gray-900/95 dark:via-emerald-950/20 dark:to-blue-950/10 border-emerald-200/30 dark:border-emerald-800/20"
               : "bg-gradient-to-br from-white/90 to-gray-100/60 dark:from-gray-900/90 dark:to-gray-800/60 border-gray-200/50 dark:border-gray-800/50"
-          }
+            }
           backdrop-blur-md
         `}
         >
