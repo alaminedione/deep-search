@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +29,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Settings,
@@ -58,7 +57,7 @@ interface SettingsPageProps {
 }
 
 export const SettingsPage = forwardRef<HTMLDivElement, SettingsPageProps>(
-  ({ searchEngine, setSearchEngine, open, onOpenChange }, ref) => {
+  ({ searchEngine, setSearchEngine, open, onOpenChange }) => {
     const { provider, model, apiKey, configured, saveConfig, clearConfig } =
       useSettingApi();
 

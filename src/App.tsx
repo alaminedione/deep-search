@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "./components/ui/button";
 import { TSearchEngine } from "./types";
 import { SettingApiProvider } from "./contexts/settingApi";
