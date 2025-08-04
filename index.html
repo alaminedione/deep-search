@@ -5,29 +5,38 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.json" />
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-CT7NM4K1YK"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-CT7NM4K1YK");
-    </script>
     <title>Deep Search</title>
+    <meta
+      name="description"
+      content="Deep Search is a powerful search engine that uses AI to find the most relevant results for your queries."
+    />
+    <meta
+      name="keywords"
+      content="search engine, AI, deep learning, information retrieval, google dork"
+    />
+    <meta name="author" content="alaminedione" />
+    <meta property="og:title" content="Deep Search" />
+    <meta
+      property="og:description"
+      content="Deep Search is a powerful search engine that uses AI to find the most relevant results for your queries."
+    />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:url" content="https://deep-search-ai.vercel.app/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Deep Search" />
+    <meta
+      name="twitter:description"
+      content="Deep Search is a powerful search engine that uses AI to find the most relevant results for your queries."
+    />
+    <meta name="twitter:image" content="/icon-512.png" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
         });
       }
     </script>
