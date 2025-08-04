@@ -9,25 +9,12 @@ import {
 
 export type AIProvider = "gemini" | "openai" | "claude" | "custom";
 
-// Map des modèles supportés par provider (pour validation)
-const SUPPORTED_MODELS: Record<AIProvider, string[]> = {
-  gemini: [
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
-    "gemini-1.0-pro",
-    "gemini-2.5-flash",
-    "gemini-2.5-pro",
-  ],
-  openai: ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo"],
-  claude: ["claude-2", "claude-3-sonnet", "claude-3-opus", "claude-sonnet-4"],
-  custom: [], // Pour 'custom', on accepte tout modèle non vide
-};
 
 // Modèles par défaut par provider
 const DEFAULT_MODELS: Record<AIProvider, string> = {
   gemini: "gemini-2.5-flash",
-  openai: "gpt-3.5-turbo",
-  claude: "claude-3-sonnet",
+  openai: "gpt-4",
+  claude: "claude-3.7-sonnet",
   custom: "",
 };
 
@@ -119,7 +106,7 @@ export interface PropsSettingApi {
   ) => Promise<void>;
   clearConfig: () => void;
   isValidConfig: boolean;
-  validateModel: (provider: AIProvider, model: string) => boolean;
+  // validateModel: (provider: AIProvider, model: string) => boolean;
 }
 
 type PropsSettingApiProvider = {
@@ -137,19 +124,18 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
   const [configured, setConfigured] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Validation d'un modèle pour un provider
-  const validateModel = useCallback(
-    (prov: AIProvider, mod: string): boolean => {
-      if (prov === "custom") return !!mod; // Accepte tout non vide pour custom
-      return SUPPORTED_MODELS[prov].includes(mod);
-    },
-    [],
-  );
+  // // Validation d'un modèle pour un provider
+  // const validateModel = useCallback(
+  //   (prov: AIProvider, mod: string): boolean => {
+  //     return true; // Always return true, no model validation
+  //   },
+  //   [],
+  // );
 
   // isValidConfig comme valeur dérivée (avec useMemo pour perf)
   const isValidConfig = useMemo(() => {
-    return !!apiKey && !!model && validateModel(provider, model);
-  }, [apiKey, model, provider, validateModel]);
+    return !!apiKey && !!model; // No model validation here either
+  }, [apiKey, model]);
 
   // Synchronise 'configured' avec isValidConfig
   useEffect(() => {
@@ -234,17 +220,13 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
   // Sauvegarde de la config (async pour chiffrement)
   const saveConfig = useCallback(
     async (newProvider: AIProvider, newModel: string, newApiKey: string) => {
-      if (!validateModel(newProvider, newModel)) {
-        throw new Error(
-          `Invalid model "${newModel}" for provider "${newProvider}"`,
-        );
-      }
+      // Removed model validation
       setProvider(newProvider);
       setModel(newModel);
       setApiKey(newApiKey);
       // 'configured' sera mis à jour via useEffect
     },
-    [validateModel],
+    [], // validateModel is no longer a dependency for saveConfig after removing its usage
   );
 
   // Reset de la config
@@ -275,7 +257,7 @@ export const SettingApiProvider = ({ children }: PropsSettingApiProvider) => {
     saveConfig,
     clearConfig,
     isValidConfig,
-    validateModel,
+    // validateModel,
   };
 
   return (
