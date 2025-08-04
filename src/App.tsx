@@ -9,13 +9,13 @@ import { AiSearchPage } from "./components/ai-search-page";
 import { HomeStats } from "./components/home-stats";
 import { HeroSection } from "./components/hero-section";
 import { Sheet, SheetContent, SheetTrigger } from "./components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, Settings } from "lucide-react";
 import { useMediaQuery } from "./hooks/use-media-query";
 
 const App = () => {
   const { toast } = useToast();
   const [currentView, setCurrentView] = useState<"home" | "search">("home");
-  const settingsRef = useRef<{ openSettings: () => void }>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const defaultSearchEngine: TSearchEngine = "google.com";
   const [searchEngine, setSearchEngine] =
     useState<TSearchEngine>(defaultSearchEngine);
@@ -93,9 +93,7 @@ const App = () => {
   );
 
   const handleOpenSettings = useCallback(() => {
-    if (settingsRef.current?.openSettings) {
-      settingsRef.current.openSettings();
-    }
+    setIsSettingsOpen(true);
   }, []);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -116,11 +114,15 @@ const App = () => {
       >
         Recherche
       </Button>
-      <SettingsPage
-        ref={settingsRef}
-        searchEngine={searchEngine}
-        setSearchEngine={setSearchEngine}
-      />
+      <Button
+        variant="ghost"
+        size="sm"
+        className="font-medium"
+        onClick={() => setIsSettingsOpen(true)}
+      >
+        <Settings className="h-4 w-4 mr-2" />
+        Paramètres
+      </Button>
     </>
   );
 
@@ -179,6 +181,13 @@ const App = () => {
             </div>
           )}
         </main>
+
+        <SettingsPage
+          open={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          searchEngine={searchEngine}
+          setSearchEngine={setSearchEngine}
+        />
       </div>
     </SettingApiProvider>
   );

@@ -53,21 +53,18 @@ import {
 interface SettingsPageProps {
   searchEngine: TSearchEngine;
   setSearchEngine: (engine: TSearchEngine) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export interface SettingsPageRef {
-  openSettings: () => void;
-}
-
-export const SettingsPage = forwardRef<SettingsPageRef, SettingsPageProps>(
-  ({ searchEngine, setSearchEngine }, ref) => {
+export const SettingsPage = forwardRef<HTMLDivElement, SettingsPageProps>(
+  ({ searchEngine, setSearchEngine, open, onOpenChange }, ref) => {
     const { provider, model, apiKey, configured, saveConfig, clearConfig } =
       useSettingApi();
 
     const { theme, setTheme } = useTheme();
 
     // États locaux pour les formulaires
-    const [isOpen, setIsOpen] = useState(false);
     const [localProvider, setLocalProvider] = useState(provider);
     const [localModel, setLocalModel] = useState(model);
     const [localApiKey, setLocalApiKey] = useState(apiKey);
@@ -78,10 +75,6 @@ export const SettingsPage = forwardRef<SettingsPageRef, SettingsPageProps>(
     const [debugMode, setDebugMode] = useState(false);
     const [cacheEnabled, setCacheEnabled] = useState(true);
 
-    // Expose openSettings method via ref
-    useImperativeHandle(ref, () => ({
-      openSettings: () => setIsOpen(true),
-    }));
 
     useEffect(() => {
       setLocalProvider(provider);
@@ -177,14 +170,8 @@ export const SettingsPage = forwardRef<SettingsPageRef, SettingsPageProps>(
     };
 
     return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button variant="ghost" size="sm" className="font-medium">
-            <Settings className="h-4 w-4 mr-2" />
-            Paramètres
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-50">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
